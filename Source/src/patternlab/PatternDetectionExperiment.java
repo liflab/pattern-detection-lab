@@ -52,6 +52,11 @@ public class PatternDetectionExperiment extends Experiment
 	public static final String P_WITNESS_EVENTS = "Witness events";
 	
 	/**
+	 * Name of the parameter "Witness events per instance".
+	 */
+	public static final String P_AVG_WITNESS_EVENTS = "Witness events per instance";
+	
+	/**
 	 * Name of the parameter "Log length".
 	 */
 	public static final String P_LOG_LENGTH = "Log length";
@@ -97,6 +102,7 @@ public class PatternDetectionExperiment extends Experiment
 		describe(P_TIME, "The total time taken to process the log", Time.DIMENSION);
 		describe(P_DETECTED, "The number of distinct pattern instances detected in the log", Scalar.DIMENSION);
 		describe(P_WITNESS_EVENTS, "The total number of events from the log included as witness of a pattern instance", Scalar.DIMENSION);
+		describe(P_AVG_WITNESS_EVENTS, "The average number of witness events from the log included as witness in a pattern instance", Scalar.DIMENSION);
 		describe(P_LOG_LENGTH, "The total number of events in the log", Scalar.DIMENSION);
 		describe(P_MAX_INSTANCES, "The maximum number of monitor instances used by the analysis", Scalar.DIMENSION);
 	}
@@ -135,6 +141,7 @@ public class PatternDetectionExperiment extends Experiment
 		writeOutput(P_TIME, new Millisecond(Stopwatch.stop(this)));
 		writeOutput(P_DETECTED, detected);
 		writeOutput(P_WITNESS_EVENTS, witnesses);
+		writeOutput(P_AVG_WITNESS_EVENTS, (float) witnesses / (float) detected);
 		writeOutput(P_LOG_LENGTH, len);
 		writeOutput(P_MAX_INSTANCES, max_instances);
 	}
