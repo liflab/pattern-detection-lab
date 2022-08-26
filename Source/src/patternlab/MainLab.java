@@ -17,10 +17,32 @@
  */
 package patternlab;
 
+import ca.uqac.lif.cep.tmf.QueueSource;
 import ca.uqac.lif.labpal.Laboratory;
+import ca.uqac.lif.synthia.random.RandomFloat;
+import patternlab.monitor.BFollowsAMonitor;
+import patternlab.pattern.BFollowsAPattern;
+import patternlab.pattern.InjectedPatternPicker;
+import patternlab.pattern.InjectedPatternSource;
+import patternlab.pattern.RandomAlphabet;
 
 public class MainLab extends Laboratory
 {
+	@Override
+	public void setup()
+	{
+		RandomFloat rf = new RandomFloat().setSeed(0);
+		InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(new RandomAlphabet(rf, "a", "c", "d"), new BFollowsAPattern(), 1, 0.75f, rf);
+		InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, 100);
+		//QueueSource ips = new QueueSource().setEvents("a", "b").loop(false);
+		
+		InstrumentedFindPattern ifp = new InstrumentedFindPattern(new BFollowsAMonitor());
+		ifp.setRemoveNonProgressing(false);
+		ifp.setRemoveImmobileOnStart(false);
+		PatternDetectionExperiment e = new PatternDetectionExperiment(ips, ifp);
+		add(e);
+	}
+	
 	public static void main(String[] args)
 	{
 		initialize(args, MainLab.class);

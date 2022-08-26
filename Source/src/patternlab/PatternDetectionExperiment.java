@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Queue;
 
 import ca.uqac.lif.cep.Connector;
+import ca.uqac.lif.cep.Processor;
+import ca.uqac.lif.cep.Pullable;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.ltl.FindPattern.PatternInstance;
 import ca.uqac.lif.cep.tmf.QueueSink;
@@ -60,16 +62,16 @@ public class PatternDetectionExperiment extends Experiment
 	public static final String P_MAX_INSTANCES = "Max instances";
 	
 	/**
-	 * A picker producing the events to be analyzed.
+	 * A processor producing the events to be analyzed.
 	 */
-	/*@ non_null @*/ protected final Bounded<?> m_log;
+	/*@ non_null @*/ protected final Processor m_log;
 	
 	/**
 	 * A processor detecting instances of the pattern to look for.
 	 */
 	/*@ non_null @*/ protected final InstrumentedFindPattern m_pattern;
 	
-	public PatternDetectionExperiment(Bounded<?> log, InstrumentedFindPattern pat)
+	public PatternDetectionExperiment(Processor log, InstrumentedFindPattern pat)
 	{
 		super();
 		m_log = log;
@@ -88,17 +90,19 @@ public class PatternDetectionExperiment extends Experiment
 		QueueSink sink = new QueueSink();
 		Connector.connect(m_pattern, sink);
 		Queue<?> q = sink.getQueue();
-		Pushable p = m_pattern.getPushableInput();
+		Pushable ph = m_pattern.getPushableInput();
+		Pullable pl = m_log.getPullableOutput();
 		int len = 0;
 		int witnesses = 0;
 		int detected = 0;
 		int max_instances = 0;
 		Stopwatch.start(this);
-		while (!m_log.isDone())
+		while (pl.hasNext())
 		{
 			len++;
-			Object e = m_log.pick();
-			p.push(e);
+			Object e = pl.pull();
+			ph.push(e);
+			System.out.print(e + " ");
 			max_instances = Math.max(max_instances, m_pattern.getInstances());
 			if (!q.isEmpty())
 			{
