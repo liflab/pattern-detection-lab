@@ -62,6 +62,21 @@ public class PatternDetectionExperiment extends Experiment
 	public static final String P_MAX_INSTANCES = "Max instances";
 	
 	/**
+	 * Name of the parameter "Algorithm".
+	 */
+	public static final String P_ALGORITHM = "Algorithm";
+	
+	/**
+	 * Name of the parameter "Pattern".
+	 */
+	public static final String P_PATTERN = "Pattern";
+	
+	/**
+	 * Name of the parameter "alpha".
+	 */
+	public static final String P_ALPHA = "\u03b1";
+	
+	/**
 	 * A processor producing the events to be analyzed.
 	 */
 	/*@ non_null @*/ protected final Processor m_log;
@@ -76,6 +91,9 @@ public class PatternDetectionExperiment extends Experiment
 		super();
 		m_log = log;
 		m_pattern = pat;
+		describe(P_ALGORITHM, "The technique used to detect patterns", Scalar.DIMENSION);
+		describe(P_PATTERN, "The pattern to detect", Scalar.DIMENSION);
+		describe(P_ALPHA, "The density of non-pattern events in the log", Scalar.DIMENSION);
 		describe(P_TIME, "The total time taken to process the log", Time.DIMENSION);
 		describe(P_DETECTED, "The number of distinct pattern instances detected in the log", Scalar.DIMENSION);
 		describe(P_WITNESS_EVENTS, "The total number of events from the log included as witness of a pattern instance", Scalar.DIMENSION);
@@ -102,7 +120,7 @@ public class PatternDetectionExperiment extends Experiment
 			len++;
 			Object e = pl.pull();
 			ph.push(e);
-			System.out.print(e + " ");
+			//System.out.print(e + " ");
 			max_instances = Math.max(max_instances, m_pattern.getInstances());
 			if (!q.isEmpty())
 			{

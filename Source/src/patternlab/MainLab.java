@@ -17,8 +17,18 @@
  */
 package patternlab;
 
-import ca.uqac.lif.cep.tmf.QueueSource;
+import ca.uqac.lif.dag.NodeConnector;
 import ca.uqac.lif.labpal.Laboratory;
+import ca.uqac.lif.labpal.plot.Plot;
+import ca.uqac.lif.labpal.region.Point;
+import ca.uqac.lif.labpal.region.Region;
+import ca.uqac.lif.labpal.table.ExperimentTable;
+import ca.uqac.lif.labpal.table.TransformedTable;
+import ca.uqac.lif.petitpoucet.function.Circuit;
+import ca.uqac.lif.spreadsheet.chart.Chart.Axis;
+import ca.uqac.lif.spreadsheet.chart.gnuplot.GnuplotScatterplot;
+import ca.uqac.lif.spreadsheet.functions.ExpandAsColumns;
+import ca.uqac.lif.spreadsheet.functions.Sort;
 import ca.uqac.lif.synthia.random.RandomFloat;
 import patternlab.monitor.BFollowsAMonitor;
 import patternlab.pattern.BFollowsAPattern;
@@ -26,23 +36,93 @@ import patternlab.pattern.InjectedPatternPicker;
 import patternlab.pattern.InjectedPatternSource;
 import patternlab.pattern.RandomAlphabet;
 
+import static ca.uqac.lif.labpal.region.ExtensionDomain.extension;
+import static ca.uqac.lif.labpal.region.ProductRegion.product;
+import static patternlab.PatternDetectionExperiment.P_ALGORITHM;
+import static patternlab.PatternDetectionExperiment.P_ALPHA;
+import static patternlab.PatternDetectionExperiment.P_TIME;
+import static patternlab.PatternDetectionExperiment.P_PATTERN;
+import static patternlab.PatternDetectionExperiment.P_WITNESS_EVENTS;
+import static patternlab.InstrumentedFindPattern.DIRECT;
+import static patternlab.InstrumentedFindPattern.FIRST_STEP;
+import static patternlab.InstrumentedFindPattern.PROGRESSING;
+
+
 public class MainLab extends Laboratory
 {
 	@Override
 	public void setup()
 	{
-		RandomFloat rf = new RandomFloat().setSeed(0);
-		InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(new RandomAlphabet(rf, "a", "c", "d"), new BFollowsAPattern(), 1, 0.75f, rf);
-		InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, 100);
-		//QueueSource ips = new QueueSource().setEvents("a", "b").loop(false);
-		
-		InstrumentedFindPattern ifp = new InstrumentedFindPattern(new BFollowsAMonitor());
-		ifp.setRemoveNonProgressing(false);
-		ifp.setRemoveImmobileOnStart(false);
-		PatternDetectionExperiment e = new PatternDetectionExperiment(ips, ifp);
-		add(e);
+		PatternDetectionExperimentFactory factory = new PatternDetectionExperimentFactory(this);
+
+		Region big_r = product(
+				extension(P_ALGORITHM, DIRECT, FIRST_STEP, PROGRESSING),
+				extension(P_PATTERN, BFollowsAPattern.NAME),
+				extension(P_ALPHA, 0.999f, 0.99f, 0.95f, 0.9f, 0.75f, 0.5f));
+
+		// For fixed alpha
+		for (Region r : big_r.all(P_ALPHA))
+		{
+			float alpha = (Float) r.asPoint().get(P_ALPHA);
+			{
+				ExperimentTable et_witnesses = new ExperimentTable(P_PATTERN, P_ALGORITHM, P_WITNESS_EVENTS);
+				et_witnesses.add(factory.get(r));
+				TransformedTable tt_witnesses = new TransformedTable(new ExpandAsColumns(P_ALGORITHM, P_WITNESS_EVENTS), et_witnesses);
+				tt_witnesses.setTitle("Number of witness events for each algorithm, \u03b1 = " + alpha);
+				add(tt_witnesses);
+			}
+			{
+				ExperimentTable et_witnesses = new ExperimentTable(P_PATTERN, P_ALGORITHM, P_TIME);
+				et_witnesses.add(factory.get(r));
+				TransformedTable tt_witnesses = new TransformedTable(new ExpandAsColumns(P_ALGORITHM, P_TIME), et_witnesses);
+				tt_witnesses.setTitle("Running time for each algorithm, \u03b1 = " + alpha);
+				add(tt_witnesses);
+			}
+		}
+
+		// For fixed pattern
+		for (Region r : big_r.all(P_PATTERN))
+		{
+			String pattern = r.asPoint().getString(P_PATTERN);
+			{
+				ExperimentTable et_witnesses = new ExperimentTable(P_ALPHA, P_ALGORITHM, P_WITNESS_EVENTS);
+				et_witnesses.add(factory.get(r));
+				Circuit g = new Circuit(1, 1);
+				{
+					ExpandAsColumns e = new ExpandAsColumns(P_ALGORITHM, P_WITNESS_EVENTS);
+					Sort s = new Sort().by(0).excludeFirst();
+					NodeConnector.connect(e, 0, s, 0);
+					g.addNodes(e, s);
+					g.associateInput(0, e.getInputPin(0));
+					g.associateOutput(0, s.getOutputPin(0));
+				}
+				TransformedTable tt_witnesses = new TransformedTable(g, et_witnesses);
+				tt_witnesses.setTitle("Impact of pattern density on witnesss, pattern " + pattern);
+				add(tt_witnesses);
+				Plot p = new Plot(tt_witnesses, new GnuplotScatterplot().setCaption(Axis.X, "\u03b1").setCaption(Axis.Y, "Witness events").setLogscale(Axis.Y));
+				add(p);
+			}
+			{
+				ExperimentTable et_witnesses = new ExperimentTable(P_ALPHA, P_ALGORITHM, P_TIME);
+				et_witnesses.add(factory.get(r));
+				Circuit g = new Circuit(1, 1);
+				{
+					ExpandAsColumns e = new ExpandAsColumns(P_ALGORITHM, P_TIME);
+					Sort s = new Sort().by(0).excludeFirst();
+					NodeConnector.connect(e, 0, s, 0);
+					g.addNodes(e, s);
+					g.associateInput(0, e.getInputPin(0));
+					g.associateOutput(0, s.getOutputPin(0));
+				}
+				TransformedTable tt_witnesses = new TransformedTable(g, et_witnesses);
+				tt_witnesses.setTitle("Impact of pattern density on running time, pattern " + pattern);
+				add(tt_witnesses);
+				Plot p = new Plot(tt_witnesses, new GnuplotScatterplot().setCaption(Axis.X, "\u03b1").setCaption(Axis.Y, "Witness events").setLogscale(Axis.Y));
+				add(p);
+			}
+		}
 	}
-	
+
 	public static void main(String[] args)
 	{
 		initialize(args, MainLab.class);

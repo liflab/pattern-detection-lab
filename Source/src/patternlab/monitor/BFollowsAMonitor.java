@@ -31,6 +31,11 @@ import ca.uqac.lif.cep.ltl.Troolean;
 public class BFollowsAMonitor extends SynchronousProcessor implements Stateful
 {
 	/**
+	 * The name of this pattern.
+	 */
+	public static final String NAME = "b follows a";
+	
+	/**
 	 * The internal state of the monitor.
 	 */
 	protected int m_state = 0;

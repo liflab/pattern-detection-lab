@@ -22,6 +22,24 @@ import ca.uqac.lif.cep.ltl.FindPattern;
 
 public class InstrumentedFindPattern extends FindPattern
 {
+	/**
+	 * A string indicating that the processor only keeps progressing
+	 * subsequences.
+	 */
+	public static final String PROGRESSING = "Progressing";
+	
+	/**
+	 * A string indicating that the processor only keeps monitor instances that
+	 * move out of their initial state on the first event consumed.
+	 */
+	public static final String FIRST_STEP = "First step";
+	
+	/**
+	 * A string indicating that all monitor instances are kept until they produce
+	 * a definite verdict.
+	 */
+	public static final String DIRECT = "Direct";
+	
 	public InstrumentedFindPattern(Processor pattern)
 	{
 		super(pattern);

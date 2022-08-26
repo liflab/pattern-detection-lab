@@ -26,6 +26,11 @@ import ca.uqac.lif.synthia.Picker;
 public class BFollowsAPattern implements Picker<List<String>>, Notifiable<String>
 {
 	/**
+	 * The name of this pattern.
+	 */
+	public static final String NAME = "b follows a";
+	
+	/**
 	 * The current state of the pattern.
 	 */
 	protected int m_state = 0;
