@@ -30,7 +30,7 @@ import ca.uqac.lif.spreadsheet.chart.gnuplot.GnuplotScatterplot;
 import ca.uqac.lif.spreadsheet.functions.ExpandAsColumns;
 import ca.uqac.lif.spreadsheet.functions.Sort;
 import ca.uqac.lif.synthia.random.RandomFloat;
-import patternlab.monitor.BFollowsAMonitor;
+import patternlab.pattern.BFollowsAMonitor;
 import patternlab.pattern.BFollowsAPattern;
 import patternlab.pattern.InjectedPatternPicker;
 import patternlab.pattern.InjectedPatternSource;

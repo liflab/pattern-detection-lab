@@ -25,7 +25,7 @@ import ca.uqac.lif.labpal.experiment.ExperimentFactory;
 import ca.uqac.lif.labpal.region.Point;
 import ca.uqac.lif.synthia.Picker;
 import ca.uqac.lif.synthia.random.RandomFloat;
-import patternlab.monitor.BFollowsAMonitor;
+import patternlab.pattern.BFollowsAMonitor;
 import patternlab.pattern.BFollowsAPattern;
 import patternlab.pattern.InjectedPatternPicker;
 import patternlab.pattern.InjectedPatternSource;
