@@ -54,10 +54,15 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		InstrumentedFindPattern ifp = new InstrumentedFindPattern(monitor);
 		switch (p.getString(P_ALGORITHM))
 		{
+		case InstrumentedFindPattern.PROGRESSING:
+			ifp.setRemoveSameState(false);
+			break;
 		case InstrumentedFindPattern.FIRST_STEP:
+			ifp.setRemoveSameState(false);
 			ifp.setRemoveNonProgressing(false);
 			break;
 		case InstrumentedFindPattern.DIRECT:
+			ifp.setRemoveSameState(false);
 			ifp.setRemoveNonProgressing(false);
 			ifp.setRemoveImmobileOnStart(false);
 			break;

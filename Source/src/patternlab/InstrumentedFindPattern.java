@@ -18,10 +18,16 @@
 package patternlab;
 
 import ca.uqac.lif.cep.Processor;
-import ca.uqac.lif.cep.ltl.FindPattern;
+import ca.uqac.lif.cep.ltl.FindMonitorPattern;
 
-public class InstrumentedFindPattern extends FindPattern
+public class InstrumentedFindPattern extends FindMonitorPattern
 {
+	/**
+	 * A string indicating that the processor only keeps monitor instances
+	 * in distinct states.
+	 */
+	public static final String DISTINCT_STATES = "Distinct states";
+	
 	/**
 	 * A string indicating that the processor only keeps progressing
 	 * subsequences.
@@ -68,6 +74,11 @@ public class InstrumentedFindPattern extends FindPattern
 	public void setRemoveNonProgressing(boolean b)
 	{
 		m_removeNonProgressing = b;
+	}
+	
+	public void setRemoveSameState(boolean b)
+	{
+		m_removeSameState = b;
 	}
 
 }

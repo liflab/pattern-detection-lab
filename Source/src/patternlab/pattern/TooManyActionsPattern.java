@@ -1,12 +1,11 @@
 package patternlab.pattern;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import ca.uqac.lif.synthia.NoMoreElementException;
 import ca.uqac.lif.synthia.Picker;
+import ca.uqac.lif.synthia.random.RandomInteger;
 
 public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tuple>
 {
@@ -16,25 +15,33 @@ public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tu
 	
 	protected List<String> m_totalPayloads;
 	
-	protected Set<String> m_availablePayloads;
+	protected List<String> m_availablePayloads;
 	
-	public TooManyActionsPattern(List<String> total_payloads)
+	protected Picker<Boolean> m_repeat;
+	
+	protected RandomInteger m_indexPicker;
+	
+	public TooManyActionsPattern(List<String> total_payloads, Picker<Boolean> repeat, RandomInteger index_picker)
 	{
 		super();
 		m_id = s_idCounter;
 		s_idCounter++;
 		m_totalPayloads = total_payloads;
-		m_availablePayloads = new HashSet<String>();
+		m_availablePayloads = new ArrayList<String>();
 		m_availablePayloads.addAll(total_payloads);
+		m_repeat = repeat;
+		m_indexPicker = index_picker;
 	}
 	
-	protected TooManyActionsPattern(int id, List<String> total, Set<String> available)
+	protected TooManyActionsPattern(int id, List<String> total, List<String> available, Picker<Boolean> repeat, RandomInteger index_picker)
 	{
 		super();
 		m_id = id;
 		m_totalPayloads = total;
-		m_availablePayloads = new HashSet<String>();
+		m_availablePayloads = new ArrayList<String>();
 		m_availablePayloads.addAll(available);
+		m_repeat = repeat;
+		m_indexPicker = index_picker;
 	}
 
 	@Override
@@ -59,24 +66,21 @@ public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tu
 	{
 		if (with_state)
 		{
-			return new TooManyActionsPattern(m_id, m_totalPayloads, m_availablePayloads);
+			return new TooManyActionsPattern(m_id, m_totalPayloads, m_availablePayloads, m_repeat.duplicate(true), m_indexPicker.duplicate(true));
 		}
-		return new TooManyActionsPattern(m_totalPayloads);
+		return new TooManyActionsPattern(m_totalPayloads, m_repeat.duplicate(false), m_indexPicker.duplicate(false));
 	}
 
 	@Override
 	public List<Tuple> pick()
 	{
-		if (m_availablePayloads.isEmpty())
+		List<String> pick_from = (m_repeat.pick() ? m_totalPayloads : m_availablePayloads);
+		if (pick_from.isEmpty())
 		{
 			throw new NoMoreElementException();
 		}
-		String chosen = null;
-		for (String s : m_availablePayloads)
-		{
-			chosen = s;
-			break;
-		}
+		m_indexPicker.setInterval(0, pick_from.size());
+		String chosen = pick_from.get(m_indexPicker.pick()); 
 		m_availablePayloads.remove(chosen);
 		List<Tuple> list = new ArrayList<Tuple>(1);
 		list.add(new Tuple(m_id, chosen));

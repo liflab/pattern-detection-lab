@@ -48,7 +48,7 @@ import static patternlab.PatternDetectionExperiment.P_WITNESS_EVENTS;
 import static patternlab.InstrumentedFindPattern.DIRECT;
 import static patternlab.InstrumentedFindPattern.FIRST_STEP;
 import static patternlab.InstrumentedFindPattern.PROGRESSING;
-
+import static patternlab.InstrumentedFindPattern.DISTINCT_STATES;
 
 public class MainLab extends Laboratory
 {
@@ -58,9 +58,9 @@ public class MainLab extends Laboratory
 		PatternDetectionExperimentFactory factory = new PatternDetectionExperimentFactory(this);
 
 		Region big_r = product(
-				extension(P_ALGORITHM, DIRECT, FIRST_STEP, PROGRESSING),
+				extension(P_ALGORITHM, DIRECT, FIRST_STEP, PROGRESSING, DISTINCT_STATES),
 				extension(P_PATTERN, BFollowsAPattern.NAME),
-				extension(P_ALPHA, 0.9999f, 0.999f, 0.99f, 0.9f, 0.75f, 0.5f));
+				extension(P_ALPHA, 0.999f, 0.99f, 0.9f, 0.75f, 0.5f));
 
 		// For fixed alpha
 		for (Region r : big_r.all(P_ALPHA))

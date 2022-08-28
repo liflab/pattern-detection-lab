@@ -9,8 +9,8 @@ import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.StreamVariable;
 import ca.uqac.lif.cep.functions.UnaryFunction;
 import ca.uqac.lif.cep.io.Print;
-import ca.uqac.lif.cep.ltl.FindPattern;
-import ca.uqac.lif.cep.ltl.FindPattern.PatternInstance;
+import ca.uqac.lif.cep.ltl.FindMonitorPattern;
+import ca.uqac.lif.cep.ltl.FindMonitorPattern.PatternInstance;
 import ca.uqac.lif.cep.ltl.Troolean;
 import ca.uqac.lif.cep.ltl.Troolean.Value;
 import ca.uqac.lif.cep.tmf.QueueSink;
@@ -26,7 +26,7 @@ public class TooManyActionsTest
 	{
 		int threshold = 3;
 		MyPattern tmam = new MyPattern(threshold);
-		FindPattern fp = new FindPattern(tmam);
+		FindMonitorPattern fp = new FindMonitorPattern(tmam);
 		QueueSink print = new QueueSink();
 		Connector.connect(fp, print);
 		Pushable p = fp.getPushableInput();

@@ -24,7 +24,7 @@ import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pullable;
 import ca.uqac.lif.cep.Pushable;
-import ca.uqac.lif.cep.ltl.FindPattern.PatternInstance;
+import ca.uqac.lif.cep.ltl.FindMonitorPattern.PatternInstance;
 import ca.uqac.lif.cep.tmf.QueueSink;
 import ca.uqac.lif.labpal.experiment.Experiment;
 import ca.uqac.lif.labpal.experiment.ExperimentException;
