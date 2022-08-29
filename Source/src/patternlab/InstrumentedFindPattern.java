@@ -20,7 +20,7 @@ package patternlab;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.ltl.FindMonitorPattern;
 
-public class InstrumentedFindPattern extends FindMonitorPattern
+public class InstrumentedFindPattern extends FindMonitorPattern implements InstanceReportable
 {
 	/**
 	 * A string indicating that the processor only keeps monitor instances
@@ -51,34 +51,54 @@ public class InstrumentedFindPattern extends FindMonitorPattern
 		super(pattern);
 	}
 	
-	/**
-	 * Gets the number of monitor instances currently active inside the
-	 * processor.
-	 * @return The number of monitor instances
-	 */
+	@Override
 	/*@ pure @*/ public int getInstances()
 	{
 		return m_instances.size();
 	}
 	
+	@Override
 	public void setRemoveNonMatches(boolean b)
 	{
 		m_removeNonMatches = b;
 	}
 	
+	@Override
 	public void setRemoveImmobileOnStart(boolean b)
 	{
 		m_removeImmobileOnStart = b;
 	}
 	
+	@Override
 	public void setRemoveNonProgressing(boolean b)
 	{
 		m_removeNonProgressing = b;
 	}
 	
+	@Override
 	public void setRemoveSameState(boolean b)
 	{
 		m_removeSameState = b;
+	}
+	
+	@Override
+	public InstrumentedFindPattern duplicate(boolean with_state)
+	{
+		InstrumentedFindPattern fp = new InstrumentedFindPattern(m_pattern.duplicate(with_state));
+		if (with_state)
+		{
+			fp.m_inputCount = m_inputCount;
+			fp.m_outputCount = m_outputCount;
+			fp.m_removeImmobileOnStart = m_removeImmobileOnStart;
+			fp.m_removeNonMatches = m_removeNonMatches;
+			fp.m_removeNonProgressing = m_removeNonProgressing;
+			fp.m_removeSameState = m_removeSameState;
+			for (PatternInstance pi : m_instances)
+			{
+				fp.m_instances.add(pi.duplicate(with_state));
+			}
+		}
+		return fp;
 	}
 
 }

@@ -9,6 +9,10 @@ import ca.uqac.lif.synthia.random.RandomInteger;
 
 public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tuple>
 {
+	public static final String NAME = "Port scanning";
+	
+	public static final String P_PAYLOADS = "Number of payloads";
+	
 	protected static int s_idCounter = 10000;
 	
 	protected int m_id;

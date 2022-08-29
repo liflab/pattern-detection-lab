@@ -29,7 +29,6 @@ import ca.uqac.lif.cep.tmf.QueueSink;
 import ca.uqac.lif.labpal.experiment.Experiment;
 import ca.uqac.lif.labpal.experiment.ExperimentException;
 import ca.uqac.lif.labpal.util.Stopwatch;
-import ca.uqac.lif.synthia.Bounded;
 import ca.uqac.lif.units.Scalar;
 import ca.uqac.lif.units.Time;
 import ca.uqac.lif.units.si.Millisecond;
@@ -89,13 +88,19 @@ public class PatternDetectionExperiment extends Experiment
 	/**
 	 * A processor detecting instances of the pattern to look for.
 	 */
-	/*@ non_null @*/ protected final InstrumentedFindPattern m_pattern;
+	/*@ non_null @*/ protected final Processor m_pattern;
 	
-	public PatternDetectionExperiment(Processor log, InstrumentedFindPattern pat)
+	/**
+	 * The length of the log to process.
+	 */
+	protected int m_logLength;
+	
+	public PatternDetectionExperiment(Processor log, Processor pat, int log_length)
 	{
 		super();
 		m_log = log;
 		m_pattern = pat;
+		m_logLength = log_length;
 		describe(P_ALGORITHM, "The technique used to detect patterns", Scalar.DIMENSION);
 		describe(P_PATTERN, "The pattern to detect", Scalar.DIMENSION);
 		describe(P_ALPHA, "The density of non-pattern events in the log", Scalar.DIMENSION);
@@ -124,10 +129,14 @@ public class PatternDetectionExperiment extends Experiment
 		while (pl.hasNext())
 		{
 			len++;
+			setProgression((float) len / (float) m_logLength); 
 			Object e = pl.pull();
 			ph.push(e);
 			//System.out.print(e + " ");
-			max_instances = Math.max(max_instances, m_pattern.getInstances());
+			if (m_pattern instanceof InstanceReportable)
+			{
+				max_instances = Math.max(max_instances, ((InstanceReportable) m_pattern).getInstances());
+			}
 			if (!q.isEmpty())
 			{
 				List<PatternInstance> instances = (List<PatternInstance>) q.remove();
@@ -142,7 +151,7 @@ public class PatternDetectionExperiment extends Experiment
 		writeOutput(P_DETECTED, detected);
 		writeOutput(P_WITNESS_EVENTS, witnesses);
 		writeOutput(P_AVG_WITNESS_EVENTS, (float) witnesses / (float) detected);
-		writeOutput(P_LOG_LENGTH, len);
+		writeOutput(P_LOG_LENGTH, m_logLength);
 		writeOutput(P_MAX_INSTANCES, max_instances);
 	}
 	
