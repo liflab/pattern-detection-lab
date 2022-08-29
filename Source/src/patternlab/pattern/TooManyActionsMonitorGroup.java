@@ -12,17 +12,19 @@ import patternlab.pattern.TooManyActionsMonitor.Flatten;
 
 public class TooManyActionsMonitorGroup extends GroupProcessor implements InstanceReportable
 {
-	protected InstrumentedSlice m_slice;
+	protected final InstrumentedSlice m_slice;
 	
-	protected int m_threshold;
+	protected final InstrumentedFindPattern m_pattern;
+	
+	protected final int m_threshold;
 	
 	public TooManyActionsMonitorGroup(int threshold)
 	{
 		super(1, 1);
 		m_threshold = threshold;
 		TooManyActionsMonitor tmam = new TooManyActionsMonitor(threshold);
-		InstrumentedFindPattern fp = new InstrumentedFindPattern(tmam);
-		m_slice = new InstrumentedSlice(Tuple.getId, fp);
+		m_pattern = new InstrumentedFindPattern(tmam);
+		m_slice = new InstrumentedSlice(Tuple.getId, m_pattern);
 		ApplyFunction values = new ApplyFunction(new FunctionTree(Flatten.instance, Maps.values));
 		Connector.connect(m_slice, values);
 		addProcessors(m_slice, values);

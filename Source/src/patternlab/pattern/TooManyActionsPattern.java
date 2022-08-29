@@ -13,13 +13,15 @@ public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tu
 	
 	public static final String P_PAYLOADS = "Number of payloads";
 	
-	protected static int s_idCounter = 10000;
+	protected static int s_idCounter = 1000001;
 	
 	protected int m_id;
 	
 	protected List<String> m_totalPayloads;
 	
 	protected List<String> m_availablePayloads;
+	
+	protected List<String> m_emittedPayloads;
 	
 	protected Picker<Boolean> m_repeat;
 	
@@ -33,17 +35,20 @@ public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tu
 		m_totalPayloads = total_payloads;
 		m_availablePayloads = new ArrayList<String>();
 		m_availablePayloads.addAll(total_payloads);
+		m_emittedPayloads = new ArrayList<String>();
 		m_repeat = repeat;
 		m_indexPicker = index_picker;
 	}
 	
-	protected TooManyActionsPattern(int id, List<String> total, List<String> available, Picker<Boolean> repeat, RandomInteger index_picker)
+	protected TooManyActionsPattern(int id, List<String> total, List<String> available, List<String> emitted, Picker<Boolean> repeat, RandomInteger index_picker)
 	{
 		super();
 		m_id = id;
 		m_totalPayloads = total;
 		m_availablePayloads = new ArrayList<String>();
 		m_availablePayloads.addAll(available);
+		m_emittedPayloads = new ArrayList<String>();
+		m_emittedPayloads.addAll(emitted);
 		m_repeat = repeat;
 		m_indexPicker = index_picker;
 	}
@@ -62,6 +67,7 @@ public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tu
 		if (t.m_id == m_id)
 		{
 			m_availablePayloads.remove(t.m_payload);
+			m_emittedPayloads.add(t.m_payload);
 		}
 	}
 
@@ -70,7 +76,7 @@ public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tu
 	{
 		if (with_state)
 		{
-			return new TooManyActionsPattern(m_id, m_totalPayloads, m_availablePayloads, m_repeat.duplicate(true), m_indexPicker.duplicate(true));
+			return new TooManyActionsPattern(m_id, m_totalPayloads, m_availablePayloads, m_emittedPayloads, m_repeat.duplicate(true), m_indexPicker.duplicate(true));
 		}
 		return new TooManyActionsPattern(m_totalPayloads, m_repeat.duplicate(false), m_indexPicker.duplicate(false));
 	}
@@ -78,7 +84,7 @@ public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tu
 	@Override
 	public List<Tuple> pick()
 	{
-		List<String> pick_from = (m_repeat.pick() ? m_totalPayloads : m_availablePayloads);
+		List<String> pick_from = (m_repeat.pick() && !m_emittedPayloads.isEmpty() ? m_emittedPayloads : m_availablePayloads);
 		if (pick_from.isEmpty())
 		{
 			throw new NoMoreElementException();
@@ -86,8 +92,11 @@ public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tu
 		m_indexPicker.setInterval(0, pick_from.size());
 		String chosen = pick_from.get(m_indexPicker.pick()); 
 		m_availablePayloads.remove(chosen);
+		m_emittedPayloads.add(chosen);
 		List<Tuple> list = new ArrayList<Tuple>(1);
-		list.add(new Tuple(m_id, chosen));
+		Tuple tuple = new Tuple(m_id, chosen);
+		list.add(tuple);
+		System.out.println(tuple);
 		return list;
 	}
 
@@ -96,5 +105,6 @@ public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tu
 	{
 		m_availablePayloads.clear();
 		m_availablePayloads.addAll(m_totalPayloads);
+		m_emittedPayloads.clear();
 	}
 }

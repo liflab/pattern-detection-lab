@@ -56,11 +56,11 @@ public class MainLab extends Laboratory
 	@Override
 	public void setup()
 	{
-		PatternDetectionExperimentFactory factory = new PatternDetectionExperimentFactory(this, 100000);
+		PatternDetectionExperimentFactory factory = new PatternDetectionExperimentFactory(this, 100);
 
 		Region big_r = product(
 				extension(P_ALGORITHM, DIRECT, FIRST_STEP, PROGRESSING, DISTINCT_STATES),
-				extension(P_PATTERN, BFollowsAPattern.NAME, TooManyActionsPattern.NAME),
+				extension(P_PATTERN, /*BFollowsAPattern.NAME,*/ TooManyActionsPattern.NAME),
 				extension(P_ALPHA, 0.999f, 0.99f, 0.9f, 0.75f, 0.5f));
 
 		// For fixed alpha

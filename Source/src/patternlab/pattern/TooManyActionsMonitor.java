@@ -12,6 +12,7 @@ import ca.uqac.lif.cep.ltl.FindMonitorPattern;
 import ca.uqac.lif.cep.ltl.FindMonitorPattern.PatternInstance;
 import ca.uqac.lif.cep.ltl.Troolean;
 import ca.uqac.lif.cep.ltl.Troolean.Value;
+import ca.uqac.lif.cep.tmf.QueueSink;
 import ca.uqac.lif.cep.tmf.SinkLast;
 import ca.uqac.lif.cep.tmf.Slice;
 import ca.uqac.lif.cep.util.Bags;
@@ -22,6 +23,7 @@ import ca.uqac.lif.cep.util.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Queue;
 
 public class TooManyActionsMonitor extends GroupProcessor
 {
@@ -127,18 +129,20 @@ public class TooManyActionsMonitor extends GroupProcessor
 		Slice slice = new Slice(Tuple.getId, fp);
 		ApplyFunction values = new ApplyFunction(new FunctionTree(Flatten.instance, Maps.values));
 		Connector.connect(slice, values);
-		SinkLast print = new SinkLast();
+		QueueSink print = new QueueSink();
 		Connector.connect(values, print);
 		Pushable p = slice.getPushableInput();
 		p.push(new Tuple(1, "a"));
-		p.push(new Tuple(1, "a"));
 		p.push(new Tuple(1, "b"));
 		p.push(new Tuple(1, "c"));
-		//p.push(new Tuple(2, "c"));
+		p.push(new Tuple(1, "a"));
+		p.push(new Tuple(1, "c"));
 		p.push(new Tuple(1, "d"));
-		
-		PatternInstance ins = ((List<PatternInstance>) print.getLast()[0]).get(0);
-		System.out.println(ins);
+		//p.push(new Tuple(2, "c"));
+		//p.push(new Tuple(1, "d"));
+		Queue<?> q = print.getQueue();
+		//PatternInstance ins = ((List<PatternInstance>) print.getLast()[0]).get(0);
+		System.out.println(q);
 	}
 
 }

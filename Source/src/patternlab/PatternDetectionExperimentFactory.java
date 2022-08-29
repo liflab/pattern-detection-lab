@@ -117,7 +117,7 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		{
 			case TooManyActionsPattern.NAME:
 			{
-				int num_payloads = 100;
+				int num_payloads = 10;
 				if (p.get(TooManyActionsPattern.P_PAYLOADS) != null)
 				{
 					num_payloads = p.getInt(TooManyActionsPattern.P_PAYLOADS);
@@ -128,12 +128,21 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 					payloads.add(Integer.toString(i));
 				}
 				RandomInteger ri = new RandomInteger().setSeed(0);
-				RandomInteger id_picker = new RandomInteger().setInterval(0, 1000);
+				RandomInteger id_picker = new RandomInteger().setInterval(0, 1000).setSeed(0);
 				RandomFloat rf = new RandomFloat().setSeed(0);
-				
+				int threshold = 3;
+				if (p.get(TooManyActionsMonitor.P_THRESHOLD) != null)
+				{
+					threshold = p.getInt(TooManyActionsMonitor.P_THRESHOLD);
+				}
+				List<String> safe_payloads = new ArrayList<String>(threshold);
+				for (int i = 0; i < threshold - 1; i++)
+				{
+					safe_payloads.add(payloads.get(i));
+				}
 				InjectedPatternPicker<Tuple> ipp = new InjectedPatternPicker<Tuple>(
-						new NormalActionsPattern(payloads, ri, id_picker), 
-						new TooManyActionsPattern(payloads, new RandomBoolean(1f), new RandomInteger()), 1, alpha, rf);
+						new NormalActionsPattern(safe_payloads, ri, id_picker), 
+						new TooManyActionsPattern(payloads, new RandomBoolean(0.5f).setSeed(0), new RandomInteger().setSeed(0)), 1, alpha, rf);
 				InjectedPatternSource<Tuple> ips = new InjectedPatternSource<Tuple>(ipp, m_logLength);
 				//QueueSource ips = new QueueSource().setEvents(new Tuple(0, "0"), new Tuple(0, "1"), new Tuple(0, "2")).loop(false);
 				return ips;
@@ -163,7 +172,7 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		{
 			case TooManyActionsMonitor.NAME:
 			{
-				int threshold = 50;
+				int threshold = 3;
 				if (p.get(TooManyActionsMonitor.P_THRESHOLD) != null)
 				{
 					threshold = p.getInt(TooManyActionsPattern.P_PAYLOADS);
