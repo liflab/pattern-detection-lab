@@ -19,6 +19,10 @@ package patternlab.pattern;
 
 import java.util.Arrays;
 
+import ca.uqac.lif.cep.Connector;
+import ca.uqac.lif.cep.Pushable;
+import ca.uqac.lif.cep.tmf.SinkLast;
+
 /**
  * A simple monitor used for testing the lab. It checks that an event "a" is
  * eventually followed by a "b".
@@ -44,5 +48,21 @@ public class BFollowsAMonitor extends SequenceMonitor<String>
 		BFollowsAMonitor bfa = new BFollowsAMonitor();
 		copyInto(bfa, with_state);
 		return bfa;
+	}
+	
+	public static void main(String[] args)
+	{
+		BFollowsAMonitor mon = new BFollowsAMonitor();
+		SinkLast sink = new SinkLast();
+		Connector.connect(mon, sink);
+		Pushable p = mon.getPushableInput();
+		Object[] objs;
+		p.push("a");
+		objs = sink.getLast();
+		p.push("a");
+		objs = sink.getLast();
+		p.push("b");
+		objs = sink.getLast();
+		System.out.println(objs);
 	}
 }

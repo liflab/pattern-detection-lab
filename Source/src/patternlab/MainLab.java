@@ -56,7 +56,7 @@ public class MainLab extends Laboratory
 	@Override
 	public void setup()
 	{
-		PatternDetectionExperimentFactory factory = new PatternDetectionExperimentFactory(this, 100000);
+		PatternDetectionExperimentFactory factory = new PatternDetectionExperimentFactory(this, 10000);
 
 		Region big_r = product(
 				extension(P_ALGORITHM, DIRECT, FIRST_STEP, PROGRESSING, DISTINCT_STATES),

@@ -5,7 +5,7 @@ import java.util.Queue;
 
 import ca.uqac.lif.cep.Stateful;
 import ca.uqac.lif.cep.SynchronousProcessor;
-import ca.uqac.lif.labpal.claim.Troolean;
+import ca.uqac.lif.cep.ltl.Troolean;
 
 /**
  * A monitor that checks if a particular sequence of events has been seen in a
