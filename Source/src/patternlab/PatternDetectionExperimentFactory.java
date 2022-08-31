@@ -48,10 +48,17 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 {
 	protected int m_logLength;
 	
+	protected int m_seed;
+	
+	protected static int s_defaultThreshold = 14;
+	
+	protected static int s_defaultPayloads = 15;
+	
 	public PatternDetectionExperimentFactory(Laboratory lab, int log_length)
 	{
 		super(lab);
 		m_logLength = log_length;
+		m_seed = m_lab.getRandomSeed();
 	}
 	
 	@Override
@@ -117,7 +124,7 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		{
 			case TooManyActionsPattern.NAME:
 			{
-				int num_payloads = 10;
+				int num_payloads = s_defaultPayloads;
 				if (p.get(TooManyActionsPattern.P_PAYLOADS) != null)
 				{
 					num_payloads = p.getInt(TooManyActionsPattern.P_PAYLOADS);
@@ -127,10 +134,10 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 				{
 					payloads.add(Integer.toString(i));
 				}
-				RandomInteger ri = new RandomInteger().setSeed(0);
-				RandomInteger id_picker = new RandomInteger().setInterval(0, 1000).setSeed(0);
-				RandomFloat rf = new RandomFloat().setSeed(0);
-				int threshold = 3;
+				RandomInteger ri = new RandomInteger().setSeed(m_seed);
+				RandomInteger id_picker = new RandomInteger().setInterval(0, 1000).setSeed(m_seed);
+				RandomFloat rf = new RandomFloat().setSeed(m_seed);
+				int threshold = s_defaultThreshold;
 				if (p.get(TooManyActionsMonitor.P_THRESHOLD) != null)
 				{
 					threshold = p.getInt(TooManyActionsMonitor.P_THRESHOLD);
@@ -142,14 +149,14 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 				}
 				InjectedPatternPicker<Tuple> ipp = new InjectedPatternPicker<Tuple>(
 						new NormalActionsPattern(safe_payloads, ri, id_picker), 
-						new TooManyActionsPattern(payloads, new RandomBoolean(0.5f).setSeed(0), new RandomInteger().setSeed(0)), 1, alpha, rf);
+						new TooManyActionsPattern(payloads, new RandomBoolean(0.5f).setSeed(m_seed), new RandomInteger().setSeed(m_seed)), 1, alpha, rf);
 				InjectedPatternSource<Tuple> ips = new InjectedPatternSource<Tuple>(ipp, m_logLength);
 				//QueueSource ips = new QueueSource().setEvents(new Tuple(0, "0"), new Tuple(0, "1"), new Tuple(0, "2")).loop(false);
 				return ips;
 			}
 			case BFollowsAPattern.NAME:
 			{
-				RandomFloat rf = new RandomFloat().setSeed(0);
+				RandomFloat rf = new RandomFloat().setSeed(m_seed);
 				InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(new RandomAlphabet(rf, "a", "c", "d"), new BFollowsAPattern(), 1, alpha, rf);
 				InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
 				return ips;
@@ -172,7 +179,7 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		{
 			case TooManyActionsMonitor.NAME:
 			{
-				int threshold = 3;
+				int threshold = s_defaultThreshold;
 				if (p.get(TooManyActionsMonitor.P_THRESHOLD) != null)
 				{
 					threshold = p.getInt(TooManyActionsPattern.P_PAYLOADS);
