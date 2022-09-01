@@ -29,15 +29,19 @@ import ca.uqac.lif.synthia.util.Constant;
  */
 public class RandomAlphabet extends Choice<List<String>>
 {
-	
 	public RandomAlphabet(Picker<Float> float_source, int size)
+	{
+		this(float_source, size, 97); // ASCII 97 = "a"
+	}
+	
+	public RandomAlphabet(Picker<Float> float_source, int size, int start_index)
 	{
 		super(float_source);
 		float p = 1f / (float) size;
 		for (int i = 0; i < size; i++)
 		{
 			List<String> list = new ArrayList<String>(1);
-			list.add(Character.toString(97 + i));
+			list.add(Character.toString(start_index + i));
 			this.add(new Constant<List<String>>(list), p);
 		}
 	}

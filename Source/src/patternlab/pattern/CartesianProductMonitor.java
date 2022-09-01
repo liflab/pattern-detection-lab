@@ -1,4 +1,4 @@
-package patternlab;
+package patternlab.pattern;
 
 import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.Processor;

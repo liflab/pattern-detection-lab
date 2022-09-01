@@ -1,4 +1,4 @@
-package patternlab.pattern;
+package patternlab.pattern.toomanyactions;
 
 import ca.uqac.lif.cep.functions.UnaryFunction;
 

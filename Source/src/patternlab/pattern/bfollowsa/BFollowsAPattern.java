@@ -15,9 +15,11 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package patternlab.pattern;
+package patternlab.pattern.bfollowsa;
 
 import java.util.Arrays;
+
+import patternlab.pattern.SequencePattern;
 
 public class BFollowsAPattern extends SequencePattern<String>
 {

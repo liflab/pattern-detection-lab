@@ -1,4 +1,4 @@
-package patternlab.pattern;
+package patternlab.pattern.toomanyactions;
 
 import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.GroupProcessor;
@@ -8,7 +8,7 @@ import ca.uqac.lif.cep.util.Maps;
 import patternlab.InstanceReportable;
 import patternlab.InstrumentedFindPattern;
 import patternlab.InstrumentedSlice;
-import patternlab.pattern.TooManyActionsMonitor.Flatten;
+import patternlab.pattern.toomanyactions.TooManyActionsMonitor.Flatten;
 
 public class TooManyActionsMonitorGroup extends GroupProcessor implements InstanceReportable
 {

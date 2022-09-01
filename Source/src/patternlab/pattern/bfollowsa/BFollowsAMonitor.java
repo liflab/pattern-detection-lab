@@ -15,13 +15,14 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package patternlab.pattern;
+package patternlab.pattern.bfollowsa;
 
 import java.util.Arrays;
 
 import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.tmf.SinkLast;
+import patternlab.pattern.SequenceMonitor;
 
 /**
  * A simple monitor used for testing the lab. It checks that an event "a" is

@@ -1,7 +1,10 @@
-package patternlab.pattern;
+package patternlab.pattern.bfollowsa;
 
 import ca.uqac.lif.cep.Pullable;
 import ca.uqac.lif.synthia.random.RandomFloat;
+import patternlab.pattern.InjectedPatternPicker;
+import patternlab.pattern.InjectedPatternSource;
+import patternlab.pattern.RandomAlphabet;
 
 public class BFollowsASourceTest
 {

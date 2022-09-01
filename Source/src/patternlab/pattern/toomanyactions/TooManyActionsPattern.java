@@ -1,4 +1,4 @@
-package patternlab.pattern;
+package patternlab.pattern.toomanyactions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import ca.uqac.lif.synthia.NoMoreElementException;
 import ca.uqac.lif.synthia.Picker;
 import ca.uqac.lif.synthia.random.RandomInteger;
+import patternlab.pattern.Notifiable;
 
 public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tuple>
 {

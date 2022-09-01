@@ -1,4 +1,4 @@
-package patternlab.pattern;
+package patternlab.pattern.toomanyactions;
 
 import java.util.Arrays;
 import java.util.List;
@@ -7,6 +7,8 @@ import ca.uqac.lif.cep.Pullable;
 import ca.uqac.lif.synthia.random.RandomBoolean;
 import ca.uqac.lif.synthia.random.RandomFloat;
 import ca.uqac.lif.synthia.random.RandomInteger;
+import patternlab.pattern.InjectedPatternPicker;
+import patternlab.pattern.InjectedPatternSource;
 
 public class TupleSourceTest
 {

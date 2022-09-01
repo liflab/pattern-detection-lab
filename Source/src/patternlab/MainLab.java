@@ -30,12 +30,13 @@ import ca.uqac.lif.spreadsheet.chart.gnuplot.GnuplotScatterplot;
 import ca.uqac.lif.spreadsheet.functions.ExpandAsColumns;
 import ca.uqac.lif.spreadsheet.functions.Sort;
 import ca.uqac.lif.synthia.random.RandomFloat;
-import patternlab.pattern.BFollowsAMonitor;
-import patternlab.pattern.BFollowsAPattern;
 import patternlab.pattern.InjectedPatternPicker;
 import patternlab.pattern.InjectedPatternSource;
 import patternlab.pattern.RandomAlphabet;
-import patternlab.pattern.TooManyActionsPattern;
+import patternlab.pattern.bfollowsa.BFollowsAMonitor;
+import patternlab.pattern.bfollowsa.BFollowsAPattern;
+import patternlab.pattern.combined.CombinedPattern;
+import patternlab.pattern.toomanyactions.TooManyActionsPattern;
 
 import static ca.uqac.lif.labpal.region.ExtensionDomain.extension;
 import static ca.uqac.lif.labpal.region.ProductRegion.product;
@@ -60,7 +61,7 @@ public class MainLab extends Laboratory
 
 		Region big_r = product(
 				extension(P_ALGORITHM, DIRECT, FIRST_STEP, PROGRESSING, DISTINCT_STATES),
-				extension(P_PATTERN, BFollowsAPattern.NAME, TooManyActionsPattern.NAME),
+				extension(P_PATTERN, BFollowsAPattern.NAME, TooManyActionsPattern.NAME, CombinedPattern.NAME),
 				extension(P_ALPHA, 0.999f, 0.99f, 0.9f, 0.75f, 0.5f));
 
 		// For fixed alpha

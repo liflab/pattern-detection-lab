@@ -29,16 +29,18 @@ import ca.uqac.lif.labpal.region.Point;
 import ca.uqac.lif.synthia.random.RandomBoolean;
 import ca.uqac.lif.synthia.random.RandomFloat;
 import ca.uqac.lif.synthia.random.RandomInteger;
-import patternlab.pattern.BFollowsAMonitor;
-import patternlab.pattern.BFollowsAPattern;
 import patternlab.pattern.InjectedPatternPicker;
 import patternlab.pattern.InjectedPatternSource;
-import patternlab.pattern.NormalActionsPattern;
 import patternlab.pattern.RandomAlphabet;
-import patternlab.pattern.TooManyActionsMonitor;
-import patternlab.pattern.TooManyActionsPattern;
-import patternlab.pattern.Tuple;
-import patternlab.pattern.TooManyActionsMonitorGroup;
+import patternlab.pattern.bfollowsa.BFollowsAMonitor;
+import patternlab.pattern.bfollowsa.BFollowsAPattern;
+import patternlab.pattern.combined.CombinedMonitor;
+import patternlab.pattern.combined.CombinedPattern;
+import patternlab.pattern.toomanyactions.NormalActionsPattern;
+import patternlab.pattern.toomanyactions.TooManyActionsMonitor;
+import patternlab.pattern.toomanyactions.TooManyActionsMonitorGroup;
+import patternlab.pattern.toomanyactions.TooManyActionsPattern;
+import patternlab.pattern.toomanyactions.Tuple;
 
 import static patternlab.PatternDetectionExperiment.P_ALGORITHM;
 import static patternlab.PatternDetectionExperiment.P_ALPHA;
@@ -154,6 +156,14 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 				InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
 				return ips;
 			}
+			case CombinedPattern.NAME:
+			{
+				RandomFloat rf = new RandomFloat().setSeed(0);
+				InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(
+						new RandomAlphabet(rf, 104, 20), new CombinedPattern(rf), 1, alpha, rf);
+				InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
+				return ips;
+			}
 		}
 		return null;
 	}
@@ -182,6 +192,11 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 			case BFollowsAMonitor.NAME:
 			{
 				InstrumentedFindPattern ifp = new InstrumentedFindPattern(new BFollowsAMonitor());
+				return ifp;
+			}
+			case CombinedPattern.NAME:
+			{
+				InstrumentedFindPattern ifp = new InstrumentedFindPattern(new CombinedMonitor());
 				return ifp;
 			}
 		}
