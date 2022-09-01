@@ -17,8 +17,10 @@
  */
 package patternlab;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.Processor;
@@ -54,6 +56,11 @@ public class PatternDetectionExperiment extends Experiment
 	 * Name of the parameter "Witness events per instance".
 	 */
 	public static final String P_AVG_WITNESS_EVENTS = "Witness events per instance";
+	
+	/**
+	 * Name of the parameter "Witness log proportion".
+	 */
+	public static final String P_WITNESS_FRACTION = "Witness log proportion";
 	
 	/**
 	 * Name of the parameter "Log length".
@@ -107,6 +114,7 @@ public class PatternDetectionExperiment extends Experiment
 		describe(P_TIME, "The total time taken to process the log", Time.DIMENSION);
 		describe(P_DETECTED, "The number of distinct pattern instances detected in the log", Scalar.DIMENSION);
 		describe(P_WITNESS_EVENTS, "The total number of events from the log included as witness of a pattern instance", Scalar.DIMENSION);
+		describe(P_WITNESS_FRACTION, "The fraction of the log included in a witness of a pattern instance", Scalar.DIMENSION);
 		describe(P_AVG_WITNESS_EVENTS, "The average number of witness events from the log included as witness in a pattern instance", Scalar.DIMENSION);
 		describe(P_LOG_LENGTH, "The total number of events in the log", Scalar.DIMENSION);
 		describe(P_MAX_INSTANCES, "The maximum number of monitor instances used by the analysis", Scalar.DIMENSION);
@@ -125,6 +133,7 @@ public class PatternDetectionExperiment extends Experiment
 		int witnesses = 0;
 		int detected = 0;
 		int max_instances = 0;
+		Set<Integer> all_witnesses = new HashSet<Integer>(m_logLength);
 		Stopwatch.start(this);
 		while (pl.hasNext())
 		{
@@ -132,7 +141,6 @@ public class PatternDetectionExperiment extends Experiment
 			setProgression((float) len / (float) m_logLength); 
 			Object e = pl.pull();
 			ph.push(e);
-			//System.out.print(e + " ");
 			if (m_pattern instanceof InstanceReportable)
 			{
 				max_instances = Math.max(max_instances, ((InstanceReportable) m_pattern).getInstances());
@@ -143,13 +151,21 @@ public class PatternDetectionExperiment extends Experiment
 				detected += instances.size();
 				for (PatternInstance pi : instances)
 				{
+					List<Integer> subseq = pi.getSubSequence();
+					int offset = pi.getStartOffset();
+					for (int index : subseq)
+					{
+						all_witnesses.add(offset + index);
+					}
 					witnesses += pi.getSubSequence().size();
 				}
 			}
 		}
+		System.out.println(readString(P_ALGORITHM) + " " + all_witnesses);
 		writeOutput(P_TIME, new Millisecond(Stopwatch.stop(this)));
 		writeOutput(P_DETECTED, detected);
 		writeOutput(P_WITNESS_EVENTS, witnesses);
+		writeOutput(P_WITNESS_FRACTION, (float) all_witnesses.size() / (float) m_logLength);
 		writeOutput(P_AVG_WITNESS_EVENTS, (float) witnesses / (float) detected);
 		writeOutput(P_LOG_LENGTH, m_logLength);
 		writeOutput(P_MAX_INSTANCES, max_instances);

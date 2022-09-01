@@ -47,6 +47,7 @@ import static patternlab.PatternDetectionExperiment.P_MAX_INSTANCES;
 import static patternlab.PatternDetectionExperiment.P_PATTERN;
 import static patternlab.PatternDetectionExperiment.P_TIME;
 import static patternlab.PatternDetectionExperiment.P_WITNESS_EVENTS;
+import static patternlab.PatternDetectionExperiment.P_WITNESS_FRACTION;
 import static patternlab.InstrumentedFindPattern.DIRECT;
 import static patternlab.InstrumentedFindPattern.FIRST_STEP;
 import static patternlab.InstrumentedFindPattern.PROGRESSING;
@@ -57,11 +58,11 @@ public class MainLab extends Laboratory
 	@Override
 	public void setup()
 	{
-		PatternDetectionExperimentFactory factory = new PatternDetectionExperimentFactory(this, 10000);
+		PatternDetectionExperimentFactory factory = new PatternDetectionExperimentFactory(this, 100);
 
 		Region big_r = product(
 				extension(P_ALGORITHM, DIRECT, FIRST_STEP, PROGRESSING, DISTINCT_STATES),
-				extension(P_PATTERN, BFollowsAPattern.NAME, TooManyActionsPattern.NAME, CombinedPattern.NAME),
+				extension(P_PATTERN, /*BFollowsAPattern.NAME, TooManyActionsPattern.NAME,*/ CombinedPattern.NAME),
 				extension(P_ALPHA, 0.999f, 0.99f, 0.9f, 0.75f, 0.5f));
 
 		// For fixed alpha
@@ -73,6 +74,13 @@ public class MainLab extends Laboratory
 				et_witnesses.add(factory.get(r));
 				TransformedTable tt_witnesses = new TransformedTable(new ExpandAsColumns(P_ALGORITHM, P_WITNESS_EVENTS), et_witnesses);
 				tt_witnesses.setTitle("Number of witness events for each algorithm, \u03b1 = " + alpha);
+				add(tt_witnesses);
+			}
+			{
+				ExperimentTable et_witnesses = new ExperimentTable(P_PATTERN, P_ALGORITHM, P_WITNESS_FRACTION);
+				et_witnesses.add(factory.get(r));
+				TransformedTable tt_witnesses = new TransformedTable(new ExpandAsColumns(P_ALGORITHM, P_WITNESS_FRACTION), et_witnesses);
+				tt_witnesses.setTitle("Fraction of log included as witness for each algorithm, \u03b1 = " + alpha);
 				add(tt_witnesses);
 			}
 			{
