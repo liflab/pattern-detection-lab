@@ -35,6 +35,18 @@ public class InjectedPatternPicker<T> implements Picker<List<T>>
 	 * pickers.
 	 */
 	protected static int s_maxTries = 100;
+	
+	/**
+	 * The maximum number of pattern instances that can be injected in the
+	 * sequence of events. A value of -1 indicates no limit.
+	 */
+	protected int m_maxPatternInstances = -1;
+	
+	/**
+	 * The number of <em>complete</em> pattern instances injected in the log so
+	 * far.
+	 */
+	protected int m_numInstances = 0;
 
 	/**
 	 * The instances of pickers that produce the actual events to be produced.
@@ -79,6 +91,19 @@ public class InjectedPatternPicker<T> implements Picker<List<T>>
 		super();
 		m_instances = choice;
 	}
+	
+	/**
+	 * Sets the maximum number of pattern instances that can be injected in the
+	 * sequence of events.
+	 * @param max_instances The number of instances. A value of -1 indicates no
+	 * limit.
+	 * @return This picker
+	 */
+	public InjectedPatternPicker<T> setMaxInstances(int max_instances)
+	{
+		m_maxPatternInstances = max_instances;
+		return this;
+	}
 
 	@Override
 	public List<T> pick()
@@ -94,7 +119,11 @@ public class InjectedPatternPicker<T> implements Picker<List<T>>
 			}
 			catch (NoMoreElementException e)
 			{
-				current_instance.reset();
+				m_numInstances++;
+				if (m_numInstances < m_maxPatternInstances)
+				{
+					current_instance.reset();
+				}
 			}
 		}
 		throw new NoMoreElementException();
@@ -104,6 +133,8 @@ public class InjectedPatternPicker<T> implements Picker<List<T>>
 	public InjectedPatternPicker<T> duplicate(boolean with_state)
 	{
 		InjectedPatternPicker<T> ipp = new InjectedPatternPicker<T>(m_instances.duplicate(with_state));
+		ipp.m_maxPatternInstances = m_maxPatternInstances;
+		ipp.m_numInstances = m_numInstances;
 		return ipp;
 	}
 
@@ -111,5 +142,6 @@ public class InjectedPatternPicker<T> implements Picker<List<T>>
 	public void reset()
 	{
 		m_instances.reset();
+		m_numInstances = 0;
 	}
 }

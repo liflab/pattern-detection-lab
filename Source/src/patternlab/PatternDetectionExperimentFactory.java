@@ -160,7 +160,7 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 			{
 				RandomFloat rf = new RandomFloat().setSeed(0);
 				InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(
-						new RandomAlphabet(rf, 104, 20), new CombinedPattern(rf), 1, alpha, rf);
+						new RandomAlphabet(rf, 26), new CombinedPattern(rf), 1, alpha, rf).setMaxInstances(1);
 				InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
 				return ips;
 			}

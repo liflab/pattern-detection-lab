@@ -140,6 +140,7 @@ public class PatternDetectionExperiment extends Experiment
 			len++;
 			setProgression((float) len / (float) m_logLength); 
 			Object e = pl.pull();
+			System.out.print(e);
 			ph.push(e);
 			if (m_pattern instanceof InstanceReportable)
 			{

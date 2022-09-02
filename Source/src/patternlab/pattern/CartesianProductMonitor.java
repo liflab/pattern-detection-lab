@@ -59,6 +59,11 @@ public class CartesianProductMonitor extends UniformProcessor implements Statefu
 			dup_mons[i] = m_monitors[i].duplicate(with_state);
 		}
 		CartesianProductMonitor cpm = new CartesianProductMonitor(dup_mons);
+		return cpm;
+	}
+	
+	protected void copyInto(CartesianProductMonitor cpm, boolean with_state)
+	{
 		if (with_state)
 		{
 			for (int i = 0; i < m_verdicts.length; i++)
@@ -66,7 +71,6 @@ public class CartesianProductMonitor extends UniformProcessor implements Statefu
 				cpm.m_verdicts[i] = m_verdicts[i];
 			}
 		}
-		return cpm;
 	}
 	
 	@Override

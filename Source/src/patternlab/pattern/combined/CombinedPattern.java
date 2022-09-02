@@ -20,8 +20,8 @@ public class CombinedPattern extends CartesianProductPattern<String>
 
 	protected static Picker<?>[] getPatterns()
 	{
-		return new Picker<?>[] {new SequencePattern<String>(Arrays.asList("a", "b")),
-			new SequencePattern<String>(Arrays.asList("c", "d")),
-			new SequencePattern<String>(Arrays.asList("e", "f"))};
+		return new Picker<?>[] {new SequencePattern<String>(Arrays.asList("A", "B")),
+			new SequencePattern<String>(Arrays.asList("C", "D")),
+			new SequencePattern<String>(Arrays.asList("E", "F"))};
 	}
 }
