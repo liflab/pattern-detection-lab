@@ -8,8 +8,6 @@ import ca.uqac.lif.cep.functions.Constant;
 import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.StreamVariable;
 import ca.uqac.lif.cep.functions.UnaryFunction;
-import ca.uqac.lif.cep.ltl.FindMonitorPattern;
-import ca.uqac.lif.cep.ltl.FindMonitorPattern.PatternInstance;
 import ca.uqac.lif.cep.ltl.Troolean;
 import ca.uqac.lif.cep.ltl.Troolean.Value;
 import ca.uqac.lif.cep.tmf.QueueSink;
@@ -19,6 +17,8 @@ import ca.uqac.lif.cep.util.Bags;
 import ca.uqac.lif.cep.util.Maps;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.cep.util.Sets;
+import patternlab.monitor.FindOccurrences;
+import patternlab.monitor.FindOccurrences.PatternInstance;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -125,7 +125,7 @@ public class TooManyActionsMonitor extends GroupProcessor
 	{
 		int threshold = 3;
 		TooManyActionsMonitor tmam = new TooManyActionsMonitor(threshold);
-		FindMonitorPattern fp = new FindMonitorPattern(tmam);
+		FindOccurrences fp = new FindOccurrences(tmam);
 		Slice slice = new Slice(Tuple.getId, fp);
 		ApplyFunction values = new ApplyFunction(new FunctionTree(Flatten.instance, Maps.values));
 		Connector.connect(slice, values);

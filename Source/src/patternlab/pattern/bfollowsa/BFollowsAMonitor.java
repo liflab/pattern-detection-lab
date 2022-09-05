@@ -17,18 +17,19 @@
  */
 package patternlab.pattern.bfollowsa;
 
-import java.util.Arrays;
-
 import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.tmf.SinkLast;
-import patternlab.pattern.SequenceMonitor;
+import patternlab.monitor.Eventually;
+import patternlab.monitor.Sequence;
+
+import static patternlab.monitor.EventEquals.eq;
 
 /**
  * A simple monitor used for testing the lab. It checks that an event "a" is
  * eventually followed by a "b".
  */
-public class BFollowsAMonitor extends SequenceMonitor<String>
+public class BFollowsAMonitor extends Sequence
 {
 	/**
 	 * The name of this pattern.
@@ -40,7 +41,7 @@ public class BFollowsAMonitor extends SequenceMonitor<String>
 	 */
 	public BFollowsAMonitor()
 	{
-		super(Arrays.asList("a", "b"));
+		super(new Eventually(eq("a")), new Eventually(eq("b")));
 	}
 	
 	@Override

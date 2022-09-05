@@ -1,12 +1,13 @@
-package patternlab.pattern;
+package patternlab.monitor;
 
-import ca.uqac.lif.cep.Connector;
-import ca.uqac.lif.cep.Processor;
-import ca.uqac.lif.cep.Pushable;
-import ca.uqac.lif.cep.Stateful;
-import ca.uqac.lif.cep.UniformProcessor;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+
 import ca.uqac.lif.cep.ltl.Troolean;
-import ca.uqac.lif.cep.tmf.SinkLast;
 import ca.uqac.lif.cep.util.Lists.MathList;
 
 /**
@@ -24,45 +25,55 @@ import ca.uqac.lif.cep.util.Lists.MathList;
  * @author Sylvain Hallé
  *
  */
-public class CartesianProductMonitor extends UniformProcessor implements Stateful
+public class AllMonitors extends MultiMonitor
 {
-	protected final Processor[] m_monitors;
-	
-	protected final Pushable[] m_pushables;
-	
-	protected final SinkLast[] m_sinks;
-	
 	protected final Troolean.Value[] m_verdicts;
-	
-	public CartesianProductMonitor(Processor ... monitors)
+
+	public AllMonitors(Monitor ... monitors)
 	{
-		super(1, 1);
-		m_monitors = monitors;
+		super(monitors);
 		m_verdicts = new Troolean.Value[monitors.length];
-		m_pushables = new Pushable[monitors.length];
-		m_sinks = new SinkLast[monitors.length];
 		for (int i = 0; i < m_verdicts.length; i++)
 		{
-			m_pushables[i] = monitors[i].getPushableInput();
-			m_sinks[i] = new SinkLast();
-			Connector.connect(m_monitors[i], m_sinks[i]);
 			m_verdicts[i] = Troolean.Value.INCONCLUSIVE;
 		}
 	}
-	
+
 	@Override
-	public CartesianProductMonitor duplicate(boolean with_state)
+	public List<Integer> getSequence()
 	{
-		Processor[] dup_mons = new Processor[m_monitors.length];
+		if (Troolean.and(m_verdicts) != Troolean.Value.TRUE)
+		{
+			return null;
+		}
+		Set<Integer> all_indices = new HashSet<Integer>();
+		for (Monitor m : m_monitors)
+		{
+			List<Integer> seq = m.getSequence();
+			if (seq != null)
+			{
+				all_indices.addAll(seq);
+			}
+		}
+		List<Integer> indices = new ArrayList<Integer>();
+		indices.addAll(all_indices);
+		Collections.sort(indices);
+		return indices;
+	}
+
+	@Override
+	public AllMonitors duplicate(boolean with_state)
+	{
+		Monitor[] dup_mons = new Monitor[m_monitors.length];
 		for (int i = 0; i < dup_mons.length; i++)
 		{
 			dup_mons[i] = m_monitors[i].duplicate(with_state);
 		}
-		CartesianProductMonitor cpm = new CartesianProductMonitor(dup_mons);
+		AllMonitors cpm = new AllMonitors(dup_mons);
 		return cpm;
 	}
-	
-	protected void copyInto(CartesianProductMonitor cpm, boolean with_state)
+
+	protected void copyInto(AllMonitors cpm, boolean with_state)
 	{
 		if (with_state)
 		{
@@ -72,23 +83,20 @@ public class CartesianProductMonitor extends UniformProcessor implements Statefu
 			}
 		}
 	}
-	
+
 	@Override
 	public Object getState()
 	{
 		MathList<Object> states = new MathList<Object>();
-		for (Processor p : m_monitors)
+		for (Monitor p : m_monitors)
 		{
-			if (p instanceof Stateful)
-			{
-				states.add(((Stateful) p).getState());
-			}
+			states.add(p.getState());
 		}
 		return states;
 	}
 
 	@Override
-	protected boolean compute(Object[] inputs, Object[] outputs)
+	protected boolean compute(Object[] inputs, Queue<Object[]> outputs)
 	{
 		Object event = inputs[0];
 		for (int i = 0; i < m_pushables.length; i++)
@@ -103,7 +111,7 @@ public class CartesianProductMonitor extends UniformProcessor implements Statefu
 				m_verdicts[i] = (Troolean.Value) outs[0];
 			}
 		}
-		outputs[0] = Troolean.and(m_verdicts);
+		outputs.add(new Object[] {Troolean.and(m_verdicts)});
 		return true;
 	}
 }

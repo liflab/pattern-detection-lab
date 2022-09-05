@@ -97,7 +97,7 @@ public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tu
 		List<Tuple> list = new ArrayList<Tuple>(1);
 		Tuple tuple = new Tuple(m_id, chosen);
 		list.add(tuple);
-		System.out.println(tuple);
+		//System.out.println(tuple);
 		return list;
 	}
 

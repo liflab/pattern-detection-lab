@@ -18,9 +18,9 @@
 package patternlab;
 
 import ca.uqac.lif.cep.Processor;
-import ca.uqac.lif.cep.ltl.FindMonitorPattern;
+import patternlab.monitor.FindOccurrences;
 
-public class InstrumentedFindPattern extends FindMonitorPattern implements InstanceReportable
+public class InstrumentedFindOccurrences extends FindOccurrences implements InstanceReportable
 {
 	/**
 	 * A string indicating that the processor only keeps monitor instances
@@ -46,7 +46,7 @@ public class InstrumentedFindPattern extends FindMonitorPattern implements Insta
 	 */
 	public static final String DIRECT = "Direct";
 	
-	public InstrumentedFindPattern(Processor pattern)
+	public InstrumentedFindOccurrences(Processor pattern)
 	{
 		super(pattern);
 	}
@@ -82,9 +82,9 @@ public class InstrumentedFindPattern extends FindMonitorPattern implements Insta
 	}
 	
 	@Override
-	public InstrumentedFindPattern duplicate(boolean with_state)
+	public InstrumentedFindOccurrences duplicate(boolean with_state)
 	{
-		InstrumentedFindPattern fp = new InstrumentedFindPattern(m_pattern.duplicate(with_state));
+		InstrumentedFindOccurrences fp = new InstrumentedFindOccurrences(m_pattern.duplicate(with_state));
 		if (with_state)
 		{
 			fp.m_inputCount = m_inputCount;

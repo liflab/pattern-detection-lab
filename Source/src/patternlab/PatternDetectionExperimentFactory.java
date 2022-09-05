@@ -67,14 +67,14 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		}
 		switch (p.getString(P_ALGORITHM))
 		{
-		case InstrumentedFindPattern.PROGRESSING:
+		case InstrumentedFindOccurrences.PROGRESSING:
 			((InstanceReportable) ifp).setRemoveSameState(false);
 			break;
-		case InstrumentedFindPattern.FIRST_STEP:
+		case InstrumentedFindOccurrences.FIRST_STEP:
 			((InstanceReportable) ifp).setRemoveSameState(false);
 			((InstanceReportable) ifp).setRemoveNonProgressing(false);
 			break;
-		case InstrumentedFindPattern.DIRECT:
+		case InstrumentedFindOccurrences.DIRECT:
 			((InstanceReportable) ifp).setRemoveSameState(false);
 			((InstanceReportable) ifp).setRemoveNonProgressing(false);
 			((InstanceReportable) ifp).setRemoveImmobileOnStart(false);
@@ -160,7 +160,7 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 			{
 				RandomFloat rf = new RandomFloat().setSeed(0);
 				InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(
-						new RandomAlphabet(rf, 26), new CombinedPattern(rf), 1, alpha, rf).setMaxInstances(1);
+						new RandomAlphabet(rf, 26), new CombinedPattern(rf), 1, alpha, rf);//.setMaxInstances(1);
 				InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
 				return ips;
 			}
@@ -191,12 +191,12 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 			}
 			case BFollowsAMonitor.NAME:
 			{
-				InstrumentedFindPattern ifp = new InstrumentedFindPattern(new BFollowsAMonitor());
+				InstrumentedFindOccurrences ifp = new InstrumentedFindOccurrences(new BFollowsAMonitor());
 				return ifp;
 			}
 			case CombinedPattern.NAME:
 			{
-				InstrumentedFindPattern ifp = new InstrumentedFindPattern(new CombinedMonitor());
+				InstrumentedFindOccurrences ifp = new InstrumentedFindOccurrences(new CombinedMonitor());
 				return ifp;
 			}
 		}
