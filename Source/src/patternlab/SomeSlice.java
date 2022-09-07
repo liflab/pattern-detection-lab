@@ -17,7 +17,6 @@
  */
 package patternlab;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -26,9 +25,8 @@ import ca.uqac.lif.cep.EventTracker;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.Function;
 import ca.uqac.lif.cep.ltl.Troolean;
-import ca.uqac.lif.cep.provenance.EventFunction.InputValue;
+import ca.uqac.lif.cep.provenance.ProvenanceTree;
 import ca.uqac.lif.cep.tmf.Slice;
-import ca.uqac.lif.petitpoucet.NodeFunction;
 import ca.uqac.lif.petitpoucet.ProvenanceNode;
 
 public class SomeSlice extends Slice
@@ -84,7 +82,7 @@ public class SomeSlice extends Slice
 						Processor p_slice = m_slices.get(slice_id);
 						EventTracker in_tracker = p_slice.getEventTracker();
 						ProvenanceNode root = in_tracker.getProvenanceTree(p_slice.getId(), 0, indices.size() - 1);
-						List<Integer> in_indices = getIndices(root);
+						List<Integer> in_indices = ProvenanceTree.getIndices(root);
 						for (int i : in_indices)
 						{
 							m_eventTracker.associateToInput(getId(), 0, indices.get(i), 0, m_numInputs);
@@ -96,33 +94,5 @@ public class SomeSlice extends Slice
 		m_numInputs++;
 		outputs.add(new Object[] {verdict});
 		return true;
-	}
-	
-	protected List<Integer> getIndices(ProvenanceNode root)
-	{
-		List<Integer> indices = new ArrayList<Integer>();
-		getIndices(root, indices);
-		return indices;
-	}
-	
-	protected void getIndices(ProvenanceNode root, List<Integer> indices)
-	{
-		NodeFunction nf = root.getNodeFunction();
-		if (nf instanceof InputValue)
-		{
-			InputValue iv = (InputValue) nf;
-			int pos = iv.getStreamPosition();
-			if (!indices.contains(pos))
-			{
-				indices.add(pos);
-			}
-		}
-		else
-		{
-			for (ProvenanceNode parent : root.getParents())
-			{
-				getIndices(parent, indices);
-			}
-		}
 	}
 }
