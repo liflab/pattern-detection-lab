@@ -30,7 +30,6 @@ import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.UniformProcessor;
 import ca.uqac.lif.cep.ltl.Troolean;
-import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.provenance.ProvenanceTree;
 import ca.uqac.lif.cep.tmf.SinkLast;
 import ca.uqac.lif.cep.util.Sets.MathSet;

@@ -29,12 +29,20 @@ public class Sequence extends UniformProcessor
 	
 	/*@ non_null @*/ protected final int[] m_witnessIndices;
 	
+	protected final boolean m_soft;
+	
 	public Sequence(int in_arity)
+	{
+		this(in_arity, false);
+	}
+	
+	public Sequence(int in_arity, boolean soft)
 	{
 		super(in_arity, 1);
 		m_waitingIndex = 0;
 		m_numInputs = 0;
 		m_witnessIndices = new int[in_arity];
+		m_soft = soft;
 	}
 
 	@Override
@@ -47,7 +55,7 @@ public class Sequence extends UniformProcessor
 				m_witnessIndices[m_waitingIndex] = m_numInputs;
 				m_waitingIndex++;
 			}
-			else if (inputs[m_waitingIndex] == Troolean.Value.FALSE)
+			else if (!m_soft && inputs[m_waitingIndex] == Troolean.Value.FALSE)
 			{
 				m_waitingIndex = -1;
 			}
@@ -78,7 +86,7 @@ public class Sequence extends UniformProcessor
 	@Override
 	public Processor duplicate(boolean with_state)
 	{
-		Sequence seq = new Sequence(getInputArity());
+		Sequence seq = new Sequence(getInputArity(), m_soft);
 		if (with_state)
 		{
 			seq.m_numInputs = m_numInputs;

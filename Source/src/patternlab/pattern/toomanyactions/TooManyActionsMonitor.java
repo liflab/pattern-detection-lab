@@ -8,6 +8,7 @@ import ca.uqac.lif.cep.functions.Constant;
 import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.StreamVariable;
 import ca.uqac.lif.cep.functions.UnaryFunction;
+import ca.uqac.lif.cep.ltl.SoftCast;
 import ca.uqac.lif.cep.ltl.Troolean;
 import ca.uqac.lif.cep.ltl.Troolean.Value;
 import ca.uqac.lif.cep.tmf.QueueSink;
@@ -46,7 +47,7 @@ public class TooManyActionsMonitor extends GroupProcessor
 		ApplyFunction payload = new ApplyFunction(Tuple.getPayload);
 		Sets.PutInto put = new Sets.PutInto();
 		ApplyFunction size = new ApplyFunction(Bags.getSize);
-		ApplyFunction gt = new ApplyFunction(new FunctionTree(new SoftCast(), new FunctionTree(Numbers.isGreaterThan, StreamVariable.X, new Constant(threshold))));
+		ApplyFunction gt = new ApplyFunction(new FunctionTree(SoftCast.instance, new FunctionTree(Numbers.isGreaterThan, StreamVariable.X, new Constant(threshold))));
 		Connector.connect(payload, put, size, gt);
 		addProcessors(payload, put, size, gt);
 		associateInput(0, payload, 0);
@@ -92,29 +93,6 @@ public class TooManyActionsMonitor extends GroupProcessor
 		}
 	}
 	
-	public static class SoftCast extends UnaryFunction<Boolean,Troolean.Value>
-	{
-		public SoftCast()
-		{
-			super(Boolean.class, Troolean.Value.class);
-		}
-
-		@Override
-		public Value getValue(Boolean x)
-		{
-			if (Boolean.FALSE.equals(x))
-			{
-				return Value.INCONCLUSIVE;
-			}
-			return Value.TRUE;
-		}
-		
-		@Override
-		public SoftCast duplicate(boolean with_state)
-		{
-			return this;
-		}
-	}
 	
 	/**
 	 * Main method for testing purposes only.
