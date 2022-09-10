@@ -18,10 +18,11 @@
 package patternlab;
 
 import ca.uqac.lif.cep.Processor;
+import ca.uqac.lif.cep.Stateful;
 import ca.uqac.lif.cep.UniformProcessor;
 import ca.uqac.lif.cep.ltl.Troolean;
 
-public class Sequence extends UniformProcessor
+public class Sequence extends UniformProcessor implements Stateful
 {
 	protected int m_waitingIndex;
 	
@@ -43,6 +44,12 @@ public class Sequence extends UniformProcessor
 		m_numInputs = 0;
 		m_witnessIndices = new int[in_arity];
 		m_soft = soft;
+	}
+	
+	@Override
+	public Object getState()
+	{
+		return m_waitingIndex;
 	}
 
 	@Override

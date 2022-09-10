@@ -30,12 +30,13 @@ import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.UniformProcessor;
 import ca.uqac.lif.cep.ltl.Troolean;
+import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.provenance.ProvenanceTree;
 import ca.uqac.lif.cep.tmf.SinkLast;
 import ca.uqac.lif.cep.util.Sets.MathSet;
 import ca.uqac.lif.petitpoucet.ProvenanceNode;
 
-public class FindOccurrences extends UniformProcessor
+public class FindOccurrences extends UniformProcessor implements Monitor
 {
 	/**
 	 * A string indicating that the processor only keeps monitor instances
@@ -61,9 +62,63 @@ public class FindOccurrences extends UniformProcessor
 	 */
 	public static final String DIRECT = "Direct";
 	
+	/**
+	 * A flag that determines if processor instances that are known to be
+	 * non-matches should be removed.
+	 */
+	protected boolean m_removeNonMatches = true;
+
+	/**
+	 * A flag that determines if newly created processor instances that remain in
+	 * their initial state should be removed.
+	 */
+	protected boolean m_removeImmobileOnStart = true;
+
+	/**
+	 * A flag that determines if events that are not part of the progressing
+	 * subsequence of an instance should be removed.
+	 */
+	protected boolean m_removeNonProgressing = true;
+	
+	/**
+	 * A flag that determines if only a single monitor instance in a given state
+	 * should be kept at any moment.
+	 */
+	protected boolean m_removeSameState = true;
+	
 	/*@ non_null @*/ protected final Processor m_monitor;
 
 	/*@ non_null @*/ protected final Set<ProcessorSlice> m_slices;
+	
+	@Override
+	/*@ pure @*/ public int getInstances()
+	{
+		return m_slices.size();
+	}
+	
+	@Override
+	public void setRemoveNonMatches(boolean b)
+	{
+		m_removeNonMatches = b;
+	}
+	
+	@Override
+	public void setRemoveImmobileOnStart(boolean b)
+	{
+		m_removeImmobileOnStart = b;
+	}
+	
+	@Override
+	public void setRemoveNonProgressing(boolean b)
+	{
+		m_removeNonProgressing = b;
+	}
+	
+	@Override
+	public void setRemoveSameState(boolean b)
+	{
+		m_removeSameState = b;
+	}
 
 	public FindOccurrences(Processor monitor)
 	{
@@ -75,7 +130,7 @@ public class FindOccurrences extends UniformProcessor
 	@Override
 	protected boolean compute(Object[] inputs, Object[] outputs)
 	{
-		ProcessorSlice new_slice = new ProcessorSlice(m_inputCount, m_monitor.duplicate());
+		ProcessorSlice new_slice = new ProcessorSlice(m_inputCount, m_monitor.duplicate().setEventTracker(new IndexEventTracker()));
 		m_slices.add(new_slice);
 		Object event = inputs[0];
 		Iterator<ProcessorSlice> it = m_slices.iterator();
@@ -99,6 +154,10 @@ public class FindOccurrences extends UniformProcessor
 		for (ProcessorSlice slice : matching_slices)
 		{
 			MathSet<Integer> indices = slice.getIndices();
+			if (!m_removeNonProgressing)
+			{
+				addAllIndices(indices);
+			}
 			if (!indices.isEmpty())
 			{
 				all_matches.add(indices);
@@ -183,6 +242,31 @@ public class FindOccurrences extends UniformProcessor
 				return false;
 			}
 			return m_offset == ((ProcessorSlice) o).m_offset;
+		}
+	}
+	
+	/**
+	 * In a given set of integers, adds all the values contained between the
+	 * minimum and maximum.
+	 * @param set The set
+	 */
+	protected static void addAllIndices(MathSet<Integer> set)
+	{
+		int min = -1, max = 0;
+		for (int i : set)
+		{
+			if (i > max)
+			{
+				max = i;
+			}
+			if (min < 0 || i < min)
+			{
+				min = i;
+			}
+		}
+		for (int i = min; i <= max; i++)
+		{
+			set.add(i);
 		}
 	}
 }

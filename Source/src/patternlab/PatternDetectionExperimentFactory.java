@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.uqac.lif.cep.Processor;
+import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.tmf.QueueSource;
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.experiment.ExperimentFactory;
@@ -34,7 +35,7 @@ import patternlab.pattern.InjectedPatternSource;
 import patternlab.pattern.RandomAlphabet;
 import patternlab.pattern.bfollowsa.BFollowsAMonitor;
 import patternlab.pattern.bfollowsa.BFollowsAPattern;
-import patternlab.pattern.combined.CombinedMonitor;
+import patternlab.pattern.combined.CombinedPatternsMonitor;
 import patternlab.pattern.combined.CombinedPattern;
 import patternlab.pattern.toomanyactions.NormalActionsPattern;
 import patternlab.pattern.toomanyactions.TooManyActionsMonitor;
@@ -48,6 +49,8 @@ import static patternlab.PatternDetectionExperiment.P_PATTERN;
 
 public class PatternDetectionExperimentFactory extends ExperimentFactory<PatternDetectionExperiment>
 {
+	protected static final int s_defaultThreshold = 3;
+	
 	protected int m_logLength;
 	
 	public PatternDetectionExperimentFactory(Laboratory lab, int log_length)
@@ -67,17 +70,17 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		}
 		switch (p.getString(P_ALGORITHM))
 		{
-		case InstrumentedFindOccurrences.PROGRESSING:
-			((InstanceReportable) ifp).setRemoveSameState(false);
+		case FindOccurrences.PROGRESSING:
+			((Monitor) ifp).setRemoveSameState(false);
 			break;
-		case InstrumentedFindOccurrences.FIRST_STEP:
-			((InstanceReportable) ifp).setRemoveSameState(false);
-			((InstanceReportable) ifp).setRemoveNonProgressing(false);
+		case FindOccurrences.FIRST_STEP:
+			((Monitor) ifp).setRemoveSameState(false);
+			((Monitor) ifp).setRemoveNonProgressing(false);
 			break;
-		case InstrumentedFindOccurrences.DIRECT:
-			((InstanceReportable) ifp).setRemoveSameState(false);
-			((InstanceReportable) ifp).setRemoveNonProgressing(false);
-			((InstanceReportable) ifp).setRemoveImmobileOnStart(false);
+		case FindOccurrences.DIRECT:
+			((Monitor) ifp).setRemoveSameState(false);
+			((Monitor) ifp).setRemoveNonProgressing(false);
+			((Monitor) ifp).setRemoveImmobileOnStart(false);
 			break;
 		}
 		PatternDetectionExperiment pde = new PatternDetectionExperiment(pattern, ifp, m_logLength);
@@ -132,7 +135,7 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 				RandomInteger ri = new RandomInteger().setSeed(0);
 				RandomInteger id_picker = new RandomInteger().setInterval(0, 1000).setSeed(0);
 				RandomFloat rf = new RandomFloat().setSeed(0);
-				int threshold = 3;
+				int threshold = s_defaultThreshold;
 				if (p.get(TooManyActionsMonitor.P_THRESHOLD) != null)
 				{
 					threshold = p.getInt(TooManyActionsMonitor.P_THRESHOLD);
@@ -182,21 +185,21 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		{
 			case TooManyActionsMonitor.NAME:
 			{
-				int threshold = 3;
+				int threshold = s_defaultThreshold;
 				if (p.get(TooManyActionsMonitor.P_THRESHOLD) != null)
 				{
 					threshold = p.getInt(TooManyActionsPattern.P_PAYLOADS);
 				}
-				return new TooManyActionsMonitorGroup(threshold);
+				return new FindOccurrences(new TooManyActionsMonitorGroup(threshold, new IndexEventTracker()));
 			}
 			case BFollowsAMonitor.NAME:
 			{
-				InstrumentedFindOccurrences ifp = new InstrumentedFindOccurrences(new BFollowsAMonitor());
+				FindOccurrences ifp = new FindOccurrences(new BFollowsAMonitor());
 				return ifp;
 			}
 			case CombinedPattern.NAME:
 			{
-				InstrumentedFindOccurrences ifp = new InstrumentedFindOccurrences(new CombinedMonitor());
+				FindOccurrences ifp = new FindOccurrences(new CombinedPatternsMonitor());
 				return ifp;
 			}
 		}

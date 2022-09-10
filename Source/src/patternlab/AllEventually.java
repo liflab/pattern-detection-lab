@@ -17,10 +17,12 @@
  */
 package patternlab;
 
+import ca.uqac.lif.cep.Stateful;
 import ca.uqac.lif.cep.UniformProcessor;
 import ca.uqac.lif.cep.ltl.Troolean;
+import ca.uqac.lif.cep.util.Lists.MathList;
 
-public class AllEventually extends UniformProcessor
+public class AllEventually extends UniformProcessor implements Stateful
 {
 	/*@ non_null @*/ protected final boolean[] m_seenTrue;
 	
@@ -39,6 +41,17 @@ public class AllEventually extends UniformProcessor
 			m_seenTrue[i] = false;
 			m_indexTrue[i] = -1;
 		}
+	}
+	
+	@Override
+	public Object getState()
+	{
+		MathList<Boolean> list = new MathList<Boolean>();
+		for (boolean b : m_seenTrue)
+		{
+			list.add(b);
+		}
+		return list;
 	}
 	
 	@Override

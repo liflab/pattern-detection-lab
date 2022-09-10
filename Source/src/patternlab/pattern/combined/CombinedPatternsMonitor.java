@@ -1,43 +1,32 @@
 package patternlab.pattern.combined;
 
-import java.util.List;
-
 import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.Pushable;
+import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.tmf.SinkLast;
-import patternlab.InstrumentedFindOccurrences;
-import patternlab.monitor.AllMonitors;
-import patternlab.monitor.Eventually;
-import patternlab.monitor.Sequence;
-import patternlab.monitor.FindOccurrences.PatternInstance;
+import ca.uqac.lif.petitpoucet.ProvenanceNode;
+import patternlab.monitor.AtomicSequence;
+import patternlab.monitor.CombinedMonitor;
 
-import static patternlab.monitor.EventEquals.eq;
-
-public class CombinedMonitor extends AllMonitors
+public class CombinedPatternsMonitor extends CombinedMonitor
 {
 	/**
 	 * The name of this pattern.
 	 */
 	public static final String NAME = CombinedPattern.NAME;
 	
-	public CombinedMonitor()
+	public CombinedPatternsMonitor()
 	{
-		super(new Sequence(new Eventually(eq("A")), new Eventually(eq("B"))),
-				new Sequence(new Eventually(eq("C")), new Eventually(eq("D"))),
-				new Sequence(new Eventually(eq("E")), new Eventually(eq("F"))));
+		super(new AtomicSequence("A", "B"),
+				new AtomicSequence("C", "D"),
+				new AtomicSequence("E", "F"));
 	}
-	
-	@Override
-	public CombinedMonitor duplicate(boolean with_state)
-	{
-		CombinedMonitor cm = new CombinedMonitor();
-		copyInto(cm, with_state);
-		return cm;
-	}
-	
+		
 	public static void main(String[] args)
 	{
-		CombinedMonitor mon = new CombinedMonitor();
+		CombinedPatternsMonitor mon = new CombinedPatternsMonitor();
+		IndexEventTracker tracker = new IndexEventTracker();
+		mon.setEventTracker(tracker);
 		//InstrumentedFindOccurrences pat = new InstrumentedFindOccurrences(mon);
 		//pat.setRemoveImmobileOnStart(false);
 		//pat.setRemoveSameState(false);
@@ -61,9 +50,7 @@ public class CombinedMonitor extends AllMonitors
 		state = mon.getState();
 		p.push("F");
 		state = mon.getState();
-		List<Integer> seq = mon.getSequence();
-		List<?> list = (List<?>) last.getLast()[0];
-		PatternInstance pi = (PatternInstance) list.get(0);
+		ProvenanceNode root = tracker.getProvenanceTree(mon, 0, 6);
 		
 	}
 }

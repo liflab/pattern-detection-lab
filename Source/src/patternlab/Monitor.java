@@ -1,6 +1,6 @@
 package patternlab;
 
-public interface InstanceReportable
+public interface Monitor
 {
 	/**
 	 * Gets the number of monitor instances currently active inside the

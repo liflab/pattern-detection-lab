@@ -17,10 +17,12 @@
  */
 package patternlab;
 
+import ca.uqac.lif.cep.Stateful;
 import ca.uqac.lif.cep.UniformProcessor;
 import ca.uqac.lif.cep.ltl.Troolean;
+import ca.uqac.lif.cep.util.Lists.MathList;
 
-public class SomeEventually extends UniformProcessor
+public class SomeEventually extends UniformProcessor implements Stateful
 {
 	protected int m_lastStream;
 	
@@ -32,6 +34,15 @@ public class SomeEventually extends UniformProcessor
 		m_lastStream = -1;
 		m_lastIndex = -1;
 		m_inputCount = 0;
+	}
+	
+	@Override
+	public Object getState()
+	{
+		MathList<Integer> list = new MathList<Integer>();
+		list.add(m_lastStream);
+		list.add(m_lastIndex);
+		return list;
 	}
 	
 	@Override

@@ -1,6 +1,7 @@
 package patternlab.pattern.toomanyactions;
 
 import ca.uqac.lif.cep.Connector;
+import ca.uqac.lif.cep.EventTracker;
 import ca.uqac.lif.cep.GroupProcessor;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.functions.ApplyFunction;
@@ -9,8 +10,7 @@ import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.functions.StreamVariable;
 import ca.uqac.lif.cep.functions.UnaryFunction;
 import ca.uqac.lif.cep.ltl.SoftCast;
-import ca.uqac.lif.cep.ltl.Troolean;
-import ca.uqac.lif.cep.ltl.Troolean.Value;
+import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.tmf.QueueSink;
 import ca.uqac.lif.cep.tmf.SinkLast;
 import ca.uqac.lif.cep.tmf.Slice;
@@ -18,8 +18,7 @@ import ca.uqac.lif.cep.util.Bags;
 import ca.uqac.lif.cep.util.Maps;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.cep.util.Sets;
-import patternlab.monitor.FindOccurrences;
-import patternlab.monitor.FindOccurrences.PatternInstance;
+import patternlab.FindOccurrences;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,24 +33,25 @@ public class TooManyActionsMonitor extends GroupProcessor
 	
 	protected int m_threshold;
 	
-	@Override
-	public TooManyActionsMonitor duplicate(boolean with_state)
-	{
-		return new TooManyActionsMonitor(m_threshold);
-	}
-
-	public TooManyActionsMonitor(int threshold)
+	public TooManyActionsMonitor(int threshold, EventTracker tracker)
 	{
 		super(1, 1);
 		m_threshold = threshold;
+		setEventTracker(tracker);
 		ApplyFunction payload = new ApplyFunction(Tuple.getPayload);
 		Sets.PutInto put = new Sets.PutInto();
 		ApplyFunction size = new ApplyFunction(Bags.getSize);
 		ApplyFunction gt = new ApplyFunction(new FunctionTree(SoftCast.instance, new FunctionTree(Numbers.isGreaterThan, StreamVariable.X, new Constant(threshold))));
-		Connector.connect(payload, put, size, gt);
+		Connector.connect(m_innerTracker, payload, put, size, gt);
 		addProcessors(payload, put, size, gt);
 		associateInput(0, payload, 0);
 		associateOutput(0, gt, 0);
+	}
+	
+	@Override
+	public TooManyActionsMonitor duplicate(boolean with_state)
+	{
+		return new TooManyActionsMonitor(m_threshold, getEventTracker().getCopy(false));
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -98,18 +98,15 @@ public class TooManyActionsMonitor extends GroupProcessor
 	 * Main method for testing purposes only.
 	 * @param args
 	 */
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args)
 	{
 		int threshold = 3;
-		TooManyActionsMonitor tmam = new TooManyActionsMonitor(threshold);
+		IndexEventTracker tracker = new IndexEventTracker();
+		TooManyActionsMonitor tmam = new TooManyActionsMonitor(threshold, tracker);
 		FindOccurrences fp = new FindOccurrences(tmam);
-		Slice slice = new Slice(Tuple.getId, fp);
-		ApplyFunction values = new ApplyFunction(new FunctionTree(Flatten.instance, Maps.values));
-		Connector.connect(slice, values);
 		QueueSink print = new QueueSink();
-		Connector.connect(values, print);
-		Pushable p = slice.getPushableInput();
+		Connector.connect(tmam, print);
+		Pushable p = tmam.getPushableInput();
 		p.push(new Tuple(1, "a"));
 		p.push(new Tuple(1, "b"));
 		p.push(new Tuple(1, "c"));

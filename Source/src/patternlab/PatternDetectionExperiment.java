@@ -18,7 +18,6 @@
 package patternlab;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -27,13 +26,13 @@ import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pullable;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.tmf.QueueSink;
+import ca.uqac.lif.cep.util.Sets.MathSet;
 import ca.uqac.lif.labpal.experiment.Experiment;
 import ca.uqac.lif.labpal.experiment.ExperimentException;
 import ca.uqac.lif.labpal.util.Stopwatch;
 import ca.uqac.lif.units.Scalar;
 import ca.uqac.lif.units.Time;
 import ca.uqac.lif.units.si.Millisecond;
-import patternlab.monitor.FindOccurrences.PatternInstance;
 
 public class PatternDetectionExperiment extends Experiment
 {
@@ -142,23 +141,18 @@ public class PatternDetectionExperiment extends Experiment
 			Object e = pl.pull();
 			System.out.print(e);
 			ph.push(e);
-			if (m_pattern instanceof InstanceReportable)
+			if (m_pattern instanceof Monitor)
 			{
-				max_instances = Math.max(max_instances, ((InstanceReportable) m_pattern).getInstances());
+				max_instances = Math.max(max_instances, ((Monitor) m_pattern).getInstances());
 			}
 			if (!q.isEmpty())
 			{
-				List<PatternInstance> instances = (List<PatternInstance>) q.remove();
+				MathSet<MathSet<Integer>> instances = (MathSet<MathSet<Integer>>) q.remove();
 				detected += instances.size();
-				for (PatternInstance pi : instances)
+				for (MathSet<Integer> pi : instances)
 				{
-					List<Integer> subseq = pi.getSubSequence();
-					int offset = pi.getStartOffset();
-					for (int index : subseq)
-					{
-						all_witnesses.add(offset + index);
-					}
-					witnesses += pi.getSubSequence().size();
+					all_witnesses.addAll(pi);
+					witnesses += pi.size();
 				}
 			}
 		}

@@ -48,10 +48,10 @@ import static patternlab.PatternDetectionExperiment.P_PATTERN;
 import static patternlab.PatternDetectionExperiment.P_TIME;
 import static patternlab.PatternDetectionExperiment.P_WITNESS_EVENTS;
 import static patternlab.PatternDetectionExperiment.P_WITNESS_FRACTION;
-import static patternlab.InstrumentedFindOccurrences.DIRECT;
-import static patternlab.InstrumentedFindOccurrences.FIRST_STEP;
-import static patternlab.InstrumentedFindOccurrences.PROGRESSING;
-import static patternlab.InstrumentedFindOccurrences.DISTINCT_STATES;
+import static patternlab.FindOccurrences.DIRECT;
+import static patternlab.FindOccurrences.FIRST_STEP;
+import static patternlab.FindOccurrences.PROGRESSING;
+import static patternlab.FindOccurrences.DISTINCT_STATES;
 
 public class MainLab extends Laboratory
 {
@@ -62,8 +62,8 @@ public class MainLab extends Laboratory
 
 		Region big_r = product(
 				extension(P_ALGORITHM, DIRECT, FIRST_STEP, PROGRESSING, DISTINCT_STATES),
-				extension(P_PATTERN, /* BFollowsAPattern.NAME, */ TooManyActionsPattern.NAME /*, CombinedPattern.NAME*/),
-				extension(P_ALPHA, 0.999f, 0.99f, 0.9f, 0.75f, 0.5f));
+				extension(P_PATTERN, BFollowsAPattern.NAME, TooManyActionsPattern.NAME, CombinedPattern.NAME),
+				extension(P_ALPHA, /*0.999f, 0.99f, */ 0.9f /*, 0.75f, 0.5f*/));
 
 		// For fixed alpha
 		for (Region r : big_r.all(P_ALPHA))
