@@ -38,29 +38,6 @@ import ca.uqac.lif.petitpoucet.ProvenanceNode;
 
 public class FindOccurrences extends UniformProcessor implements Monitor
 {
-	/**
-	 * A string indicating that the processor only keeps monitor instances
-	 * in distinct states.
-	 */
-	public static final String DISTINCT_STATES = "Distinct states";
-	
-	/**
-	 * A string indicating that the processor only keeps progressing
-	 * subsequences.
-	 */
-	public static final String PROGRESSING = "Progressing";
-	
-	/**
-	 * A string indicating that the processor only keeps monitor instances that
-	 * move out of their initial state on the first event consumed.
-	 */
-	public static final String FIRST_STEP = "First step";
-	
-	/**
-	 * A string indicating that all monitor instances are kept until they produce
-	 * a definite verdict.
-	 */
-	public static final String DIRECT = "Direct";
 	
 	/**
 	 * A flag that determines if processor instances that are known to be

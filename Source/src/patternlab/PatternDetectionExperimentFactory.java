@@ -23,7 +23,6 @@ import java.util.List;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.provenance.IndexEventTracker;
-import ca.uqac.lif.cep.tmf.QueueSource;
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.experiment.ExperimentFactory;
 import ca.uqac.lif.labpal.region.Point;
@@ -70,14 +69,14 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		}
 		switch (p.getString(P_ALGORITHM))
 		{
-		case FindOccurrences.PROGRESSING:
+		case Monitor.PROGRESSING:
 			((Monitor) ifp).setRemoveSameState(false);
 			break;
-		case FindOccurrences.FIRST_STEP:
+		case Monitor.FIRST_STEP:
 			((Monitor) ifp).setRemoveSameState(false);
 			((Monitor) ifp).setRemoveNonProgressing(false);
 			break;
-		case FindOccurrences.DIRECT:
+		case Monitor.DIRECT:
 			((Monitor) ifp).setRemoveSameState(false);
 			((Monitor) ifp).setRemoveNonProgressing(false);
 			((Monitor) ifp).setRemoveImmobileOnStart(false);
