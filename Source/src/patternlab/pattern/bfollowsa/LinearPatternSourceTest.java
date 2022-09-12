@@ -6,12 +6,12 @@ import patternlab.pattern.InjectedPatternPicker;
 import patternlab.pattern.InjectedPatternSource;
 import patternlab.pattern.RandomAlphabet;
 
-public class BFollowsASourceTest
+public class LinearPatternSourceTest
 {
 	public static void main(String[] args)
 	{
 		RandomFloat rf = new RandomFloat();
-		InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(new RandomAlphabet(rf, "a", "c", "d"), new BFollowsAPattern(), 1, 0.75f, rf);
+		InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(new RandomAlphabet(rf, "a", "c", "d"), new LinearPattern(RandomAlphabet.getUppercaseSequence(0, 2)), 1, 0.75f, rf);
 		InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, 25);
 		Pullable p = ips.getPullableOutput();
 		while (p.hasNext())

@@ -1,6 +1,10 @@
 package patternlab.monitor;
 
+import java.util.Arrays;
+import java.util.List;
+
 import ca.uqac.lif.cep.Connector;
+import ca.uqac.lif.cep.EventTracker;
 import ca.uqac.lif.cep.GroupProcessor;
 import ca.uqac.lif.cep.functions.ApplyFunction;
 import ca.uqac.lif.cep.functions.Constant;
@@ -12,31 +16,31 @@ import ca.uqac.lif.cep.tmf.Fork;
 import ca.uqac.lif.cep.util.Equals;
 import patternlab.Sequence;
 
-public class AtomicSequence extends GroupProcessor
+public class AtomicSequence<T> extends GroupProcessor
 {
-	public AtomicSequence(Object ... events)
+	public AtomicSequence(EventTracker tracker, List<T> events)
 	{
-		super(events.length, 1);
-		IndexEventTracker et = new IndexEventTracker();
-		Fork f = new Fork(events.length);
-		Sequence seq = new Sequence(events.length, true);
+		super(events.size(), 1);
+		setEventTracker(tracker);
+		Fork f = new Fork(events.size());
+		Sequence seq = new Sequence(events.size(), true);
 		addProcessors(f, seq);
-		ApplyFunction[] are = new ApplyFunction[events.length];
-		for (int i = 0; i < events.length; i++)
+		ApplyFunction[] are = new ApplyFunction[events.size()];
+		for (int i = 0; i < events.size(); i++)
 		{
-			are[i] = new ApplyFunction(new FunctionTree(TrooleanCast.instance, new FunctionTree(Equals.instance, StreamVariable.X, new Constant(events[i]))));
-			Connector.connect(et, f, i, are[i], 0);
-			Connector.connect(et, are[i], 0, seq, i);
+			are[i] = new ApplyFunction(new FunctionTree(TrooleanCast.instance, new FunctionTree(Equals.instance, StreamVariable.X, new Constant(events.get(i)))));
+			Connector.connect(m_innerTracker, f, i, are[i], 0);
+			Connector.connect(m_innerTracker, are[i], 0, seq, i);
 			addProcessor(are[i]);
 		}
 		associateInput(0, f, 0);
 		associateOutput(0, seq, 0);
-		setEventTracker(et);
 	}
 	
 	public static void main(String[] args)
 	{
-		AtomicSequence as = new AtomicSequence("a", "b");
+		IndexEventTracker tracker = new IndexEventTracker();
+		AtomicSequence<String> as = new AtomicSequence<String>(tracker, Arrays.asList("a", "b"));
 		as.duplicate();
 	}
 }

@@ -17,27 +17,37 @@
  */
 package patternlab.pattern.bfollowsa;
 
-import java.util.Arrays;
+import java.util.List;
 
 import patternlab.pattern.SequencePattern;
 
-public class BFollowsAPattern extends SequencePattern<String>
+public class LinearPattern<T> extends SequencePattern<T>
 {
 	/**
 	 * The name of this pattern.
 	 */
-	public static final String NAME = "b follows a";
+	public static final String NAME = "Linear sequence";
 	
-	public BFollowsAPattern()
+	/**
+	 * The name of the parameter "Number of elements".
+	 */
+	public static final String P_PATTERN_LENGTH = "Number of elements";
+
+	protected final List<T> m_elements;
+
+	public LinearPattern(List<T> elements)
 	{
-		super(Arrays.asList("a", "b"));
+		super(elements);
+		m_elements = elements;
 	}
 
 	@Override
-	public BFollowsAPattern duplicate(boolean with_state)
+	public LinearPattern<T> duplicate(boolean with_state)
 	{
-		BFollowsAPattern bfa = new BFollowsAPattern();
+		LinearPattern<T> bfa = new LinearPattern<T>(m_elements);
 		copyInto(bfa, with_state);
 		return bfa;
 	}
+
+	
 }

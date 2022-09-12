@@ -24,6 +24,7 @@ import java.util.Queue;
 import ca.uqac.lif.cep.EventTracker;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.Function;
+import ca.uqac.lif.cep.functions.UnaryFunction;
 import ca.uqac.lif.cep.ltl.Troolean;
 import ca.uqac.lif.cep.provenance.ProvenanceTree;
 import ca.uqac.lif.cep.tmf.Slice;
@@ -60,6 +61,7 @@ public class SomeSlice extends Slice implements Monitor
 	public SomeSlice(Function f, Processor p)
 	{
 		super(f, p);
+		m_cleaningFunction = new RemoveNonMatches();
 		m_numInputs = 0;
 	}
 
@@ -179,5 +181,24 @@ public class SomeSlice extends Slice implements Monitor
 	{
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	protected class RemoveNonMatches extends UnaryFunction<Object,Boolean>
+	{
+		public RemoveNonMatches()
+		{
+			super(Object.class, Boolean.class);
+		}
+
+		@Override
+		public Boolean getValue(Object x)
+		{
+			if (x instanceof Troolean.Value && x == Troolean.Value.FALSE && m_removeNonMatches)
+			{
+				return true;
+			}
+			return false;
+		}
+		
 	}
 }

@@ -1,35 +1,52 @@
 package patternlab.monitor;
 
+import java.util.Arrays;
+
 import ca.uqac.lif.cep.Connector;
+import ca.uqac.lif.cep.EventTracker;
 import ca.uqac.lif.cep.GroupProcessor;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.tmf.Fork;
 import patternlab.AllEventually;
+import patternlab.pattern.toomanyactions.TooManyActionsMonitor;
 
 public class CombinedMonitor extends GroupProcessor
 {
-	public CombinedMonitor(Processor ... patterns)
+	protected final Processor[] m_patterns;
+	
+	public CombinedMonitor(EventTracker tracker, Processor ... patterns)
 	{
 		super(patterns.length, 1);
-		IndexEventTracker et = new IndexEventTracker();
+		m_patterns = patterns;
+		setEventTracker(tracker);
 		Fork f = new Fork(patterns.length);
 		AllEventually seq = new AllEventually(patterns.length);
 		addProcessors(f, seq);
 		for (int i = 0; i < patterns.length; i++)
 		{
-			Connector.connect(et, f, i, patterns[i], 0);
-			Connector.connect(et, patterns[i], 0, seq, i);
+			Connector.connect(m_innerTracker, f, i, patterns[i], 0);
+			Connector.connect(m_innerTracker, patterns[i], 0, seq, i);
 			addProcessor(patterns[i]);
 		}
 		associateInput(0, f, 0);
 		associateOutput(0, seq, 0);
-		setEventTracker(et);
+	}
+	
+	@Override
+	public CombinedMonitor duplicate(boolean with_state)
+	{
+		Processor[] patterns = new Processor[m_patterns.length];
+		for (int i = 0; i < patterns.length; i++)
+		{
+			patterns[i] = m_patterns[i].duplicate();
+		}
+		return new CombinedMonitor(getEventTracker().getCopy(false), patterns);
 	}
 	
 	public static void main(String[] args)
 	{
-		CombinedMonitor cm = new CombinedMonitor(new AtomicSequence("a", "b"), new AtomicSequence("c", "d"));
+		CombinedMonitor cm = new CombinedMonitor(new IndexEventTracker(), new AtomicSequence<String>(new IndexEventTracker(), Arrays.asList("a", "b")), new AtomicSequence<String>(new IndexEventTracker(), Arrays.asList("c", "d")));
 		Processor gp = cm.duplicate();
 	}
 }

@@ -120,7 +120,7 @@ public class InjectedPatternPicker<T> implements Picker<List<T>>
 			catch (NoMoreElementException e)
 			{
 				m_numInstances++;
-				if (m_numInstances < m_maxPatternInstances)
+				if (m_maxPatternInstances < 0 || m_numInstances < m_maxPatternInstances)
 				{
 					current_instance.reset();
 				}

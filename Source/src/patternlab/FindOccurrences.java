@@ -20,19 +20,21 @@ package patternlab;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 import ca.uqac.lif.cep.Connector;
 import ca.uqac.lif.cep.EventTracker;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pushable;
+import ca.uqac.lif.cep.Stateful;
 import ca.uqac.lif.cep.UniformProcessor;
 import ca.uqac.lif.cep.ltl.Troolean;
 import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.provenance.ProvenanceTree;
 import ca.uqac.lif.cep.tmf.SinkLast;
+import ca.uqac.lif.cep.util.Equals;
 import ca.uqac.lif.cep.util.Sets.MathSet;
 import ca.uqac.lif.petitpoucet.ProvenanceNode;
 
@@ -65,7 +67,7 @@ public class FindOccurrences extends UniformProcessor implements Monitor
 	
 	/*@ non_null @*/ protected final Processor m_monitor;
 
-	/*@ non_null @*/ protected final Set<ProcessorSlice> m_slices;
+	/*@ non_null @*/ protected final List<ProcessorSlice> m_slices;
 	
 	@Override
 	/*@ pure @*/ public int getInstances()
@@ -101,7 +103,7 @@ public class FindOccurrences extends UniformProcessor implements Monitor
 	{
 		super(1, 1);
 		m_monitor = monitor;
-		m_slices = new HashSet<ProcessorSlice>();
+		m_slices = new ArrayList<ProcessorSlice>();
 	}
 
 	@Override
@@ -110,12 +112,29 @@ public class FindOccurrences extends UniformProcessor implements Monitor
 		ProcessorSlice new_slice = new ProcessorSlice(m_inputCount, m_monitor.duplicate().setEventTracker(new IndexEventTracker()));
 		m_slices.add(new_slice);
 		Object event = inputs[0];
-		Iterator<ProcessorSlice> it = m_slices.iterator();
+		ListIterator<ProcessorSlice> it = m_slices.listIterator(m_slices.size());
 		List<ProcessorSlice> matching_slices = new ArrayList<ProcessorSlice>();
-		while (it.hasNext())
+		Set<Object> seen_states = new HashSet<Object>();
+		boolean last = true;
+		while (it.hasPrevious())
 		{
-			ProcessorSlice slice = it.next();
+			ProcessorSlice slice = it.previous();
+			Object s_before = null, s_after = null;
+			if (m_removeImmobileOnStart && last)
+			{
+				s_before = slice.getState();
+				last = false;
+			}
 			Troolean.Value verdict = slice.push(event);
+			if (m_removeImmobileOnStart || m_removeSameState)
+			{
+				s_after = slice.getState();
+				if (m_removeImmobileOnStart && Equals.isEqualTo(s_before, s_after))
+				{
+					it.remove();
+					continue;
+				}
+			}
 			if (verdict == Troolean.Value.TRUE)
 			{
 				matching_slices.add(slice);
@@ -123,7 +142,21 @@ public class FindOccurrences extends UniformProcessor implements Monitor
 			}
 			else if (verdict == Troolean.Value.FALSE)
 			{
-				it.remove();
+				if (m_removeNonMatches)
+				{
+					it.remove();
+				}
+			}
+			if (m_removeSameState)
+			{
+				if (seen_states.contains(s_after))
+				{
+					it.remove();
+				}
+				else
+				{
+					seen_states.add(s_after);
+				}
 			}
 		}
 		Collections.sort(matching_slices);
@@ -163,6 +196,10 @@ public class FindOccurrences extends UniformProcessor implements Monitor
 		protected final int m_offset;
 		
 		protected int m_numPushes;
+		
+		protected boolean m_pushed;
+		
+		protected Object m_lastState;
 
 		public ProcessorSlice(int offset, Processor p)
 		{
@@ -173,12 +210,15 @@ public class FindOccurrences extends UniformProcessor implements Monitor
 			m_pushable = p.getPushableInput();
 			m_offset = offset;
 			m_numPushes = 0;
+			m_pushed = true;
+			m_lastState = null;
 		}
 		
 		public Troolean.Value push(Object event)
 		{
 			m_pushable.push(event);
 			m_numPushes++;
+			m_pushed = true;
 			return (Troolean.Value) m_sink.getLast()[0];
 		}
 		
@@ -197,6 +237,16 @@ public class FindOccurrences extends UniformProcessor implements Monitor
 				indices.add(index + m_offset);
 			}
 			return indices;
+		}
+		
+		public Object getState()
+		{
+			if (m_pushed && m_processor instanceof Stateful)
+			{
+				m_pushed = false;
+				m_lastState = ((Stateful) m_processor).getState();
+			}
+			return m_lastState;
 		}
 
 		@Override

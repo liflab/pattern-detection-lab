@@ -1,12 +1,15 @@
 package patternlab.pattern.combined;
 
 import ca.uqac.lif.cep.Connector;
+import ca.uqac.lif.cep.EventTracker;
+import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.tmf.SinkLast;
 import ca.uqac.lif.petitpoucet.ProvenanceNode;
 import patternlab.monitor.AtomicSequence;
 import patternlab.monitor.CombinedMonitor;
+import patternlab.pattern.RandomAlphabet;
 
 public class CombinedPatternsMonitor extends CombinedMonitor
 {
@@ -15,17 +18,25 @@ public class CombinedPatternsMonitor extends CombinedMonitor
 	 */
 	public static final String NAME = CombinedPattern.NAME;
 	
-	public CombinedPatternsMonitor()
+	public CombinedPatternsMonitor(EventTracker tracker, int num_patterns)
 	{
-		super(new AtomicSequence("A", "B"),
-				new AtomicSequence("C", "D"),
-				new AtomicSequence("E", "F"));
+		super(tracker, getPatterns(num_patterns));
+	}
+	
+	protected static Processor[] getPatterns(int num_patterns)
+	{
+		Processor[] patterns = new Processor[num_patterns];
+		for (int i = 0; i < num_patterns; i++)
+		{
+			patterns[i] = new AtomicSequence<String>(new IndexEventTracker(), RandomAlphabet.getUppercaseSequence(i * 5, 5));
+		}
+		return patterns;
 	}
 		
 	public static void main(String[] args)
 	{
-		CombinedPatternsMonitor mon = new CombinedPatternsMonitor();
 		IndexEventTracker tracker = new IndexEventTracker();
+		CombinedPatternsMonitor mon = new CombinedPatternsMonitor(tracker, 3);
 		mon.setEventTracker(tracker);
 		//InstrumentedFindOccurrences pat = new InstrumentedFindOccurrences(mon);
 		//pat.setRemoveImmobileOnStart(false);

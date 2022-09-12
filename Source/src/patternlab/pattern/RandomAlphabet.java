@@ -57,4 +57,24 @@ public class RandomAlphabet extends Choice<List<String>>
 			this.add(new Constant<List<String>>(list), p);
 		}
 	}
+	
+	public static List<String> getUppercaseSequence(int offset, int size)
+	{
+		List<String> list = new ArrayList<String>(size);
+		for (int i = 0; i < size; i++)
+		{
+			list.add(Character.toString(65 + i + offset)); // 65 = ASCII "A"
+		}
+		return list;
+	}
+	
+	public static List<String> getLowercaseSequence(int offset, int size)
+	{
+		List<String> list = new ArrayList<String>(size);
+		for (int i = 0; i < size; i++)
+		{
+			list.add(Character.toString(97 + i + offset)); // 97 = ASCII "a"
+		}
+		return list;
+	}
 }

@@ -23,6 +23,7 @@ import java.util.List;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.provenance.IndexEventTracker;
+import ca.uqac.lif.cep.tmf.QueueSource;
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.experiment.ExperimentFactory;
 import ca.uqac.lif.labpal.region.Point;
@@ -32,8 +33,8 @@ import ca.uqac.lif.synthia.random.RandomInteger;
 import patternlab.pattern.InjectedPatternPicker;
 import patternlab.pattern.InjectedPatternSource;
 import patternlab.pattern.RandomAlphabet;
-import patternlab.pattern.bfollowsa.BFollowsAMonitor;
-import patternlab.pattern.bfollowsa.BFollowsAPattern;
+import patternlab.pattern.bfollowsa.LinearMonitor;
+import patternlab.pattern.bfollowsa.LinearPattern;
 import patternlab.pattern.combined.CombinedPatternsMonitor;
 import patternlab.pattern.combined.CombinedPattern;
 import patternlab.pattern.toomanyactions.NormalActionsPattern;
@@ -49,6 +50,10 @@ import static patternlab.PatternDetectionExperiment.P_PATTERN;
 public class PatternDetectionExperimentFactory extends ExperimentFactory<PatternDetectionExperiment>
 {
 	protected static final int s_defaultThreshold = 3;
+	
+	protected static final int s_defaultLinearPatternLength = 2;
+	
+	protected static final int s_defaultCombinedPatterns = 3;
 	
 	protected int m_logLength;
 	
@@ -151,18 +156,32 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 				//QueueSource ips = new QueueSource().setEvents(new Tuple(0, "0"), new Tuple(0, "1"), new Tuple(0, "2")).loop(false);
 				return ips;
 			}
-			case BFollowsAPattern.NAME:
+			case LinearPattern.NAME:
 			{
+				int pattern_length = s_defaultLinearPatternLength;
+				if (p.get(LinearPattern.P_PATTERN_LENGTH) != null)
+				{
+					pattern_length = p.getInt(LinearPattern.P_PATTERN_LENGTH);
+				}
 				RandomFloat rf = new RandomFloat().setSeed(0);
-				InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(new RandomAlphabet(rf, "a", "c", "d"), new BFollowsAPattern(), 1, alpha, rf);
+				InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(
+						new RandomAlphabet(rf, "a", "c", "d"),
+						new LinearPattern<String>(RandomAlphabet.getUppercaseSequence(0, pattern_length)),
+						1, alpha, rf);
 				InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
+				//QueueSource ips = new QueueSource().setEvents("c", "c", "a", "b").loop(false);
 				return ips;
 			}
 			case CombinedPattern.NAME:
 			{
+				int num_patterns = s_defaultCombinedPatterns;
+				if (p.get(CombinedPattern.P_NUM_PATTERNS) != null)
+				{
+					num_patterns = p.getInt(CombinedPattern.P_NUM_PATTERNS);
+				}
 				RandomFloat rf = new RandomFloat().setSeed(0);
 				InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(
-						new RandomAlphabet(rf, 26), new CombinedPattern(rf), 1, alpha, rf);//.setMaxInstances(1);
+						new RandomAlphabet(rf, 26), new CombinedPattern(rf, num_patterns), 1, alpha, rf);//.setMaxInstances(1);
 				InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
 				return ips;
 			}
@@ -191,14 +210,24 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 				}
 				return new FindOccurrences(new TooManyActionsMonitorGroup(threshold, new IndexEventTracker()));
 			}
-			case BFollowsAMonitor.NAME:
+			case LinearMonitor.NAME:
 			{
-				FindOccurrences ifp = new FindOccurrences(new BFollowsAMonitor());
+				int pattern_length = s_defaultLinearPatternLength;
+				if (p.get(LinearPattern.P_PATTERN_LENGTH) != null)
+				{
+					pattern_length = p.getInt(LinearPattern.P_PATTERN_LENGTH);
+				}
+				FindOccurrences ifp = new FindOccurrences(new LinearMonitor<String>(new IndexEventTracker(), RandomAlphabet.getUppercaseSequence(0, pattern_length)));
 				return ifp;
 			}
 			case CombinedPattern.NAME:
 			{
-				FindOccurrences ifp = new FindOccurrences(new CombinedPatternsMonitor());
+				int num_patterns = s_defaultCombinedPatterns;
+				if (p.get(CombinedPattern.P_NUM_PATTERNS) != null)
+				{
+					num_patterns = p.getInt(CombinedPattern.P_NUM_PATTERNS);
+				}
+				FindOccurrences ifp = new FindOccurrences(new CombinedPatternsMonitor(new IndexEventTracker(), num_patterns));
 				return ifp;
 			}
 		}
