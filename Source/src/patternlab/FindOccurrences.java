@@ -166,6 +166,12 @@ public class FindOccurrences extends UniformProcessor implements Monitor
 			MathSet<Integer> indices = slice.getIndices();
 			if (!m_removeNonProgressing)
 			{
+				if (!m_removeImmobileOnStart)
+				{
+					// Adding the first event of the slice causes all events of the slice
+					// to be added
+					indices.add(slice.m_offset);
+				}
 				addAllIndices(indices);
 			}
 			if (!indices.isEmpty())

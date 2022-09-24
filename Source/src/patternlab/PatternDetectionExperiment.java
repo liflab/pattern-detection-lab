@@ -89,12 +89,12 @@ public class PatternDetectionExperiment extends Experiment
 	/**
 	 * A processor producing the events to be analyzed.
 	 */
-	/*@ non_null @*/ protected final Processor m_log;
+	/*@ non_null @*/ protected Processor m_log;
 	
 	/**
 	 * A processor detecting instances of the pattern to look for.
 	 */
-	/*@ non_null @*/ protected final Processor m_pattern;
+	/*@ non_null @*/ protected Processor m_pattern;
 	
 	/**
 	 * The length of the log to process.
@@ -117,6 +117,22 @@ public class PatternDetectionExperiment extends Experiment
 		describe(P_AVG_WITNESS_EVENTS, "The average number of witness events from the log included as witness in a pattern instance", Scalar.DIMENSION);
 		describe(P_LOG_LENGTH, "The total number of events in the log", Scalar.DIMENSION);
 		describe(P_MAX_INSTANCES, "The maximum number of monitor instances used by the analysis", Scalar.DIMENSION);
+	}
+	
+	public PatternDetectionExperiment()
+	{
+		this(null, null, -1);
+	}
+	
+	public void setLog(Processor log, int log_length)
+	{
+		m_log = log;
+		m_logLength = log_length;
+	}
+	
+	public void setMonitor(Processor pat)
+	{
+		m_pattern = pat;
 	}
 	
 	@SuppressWarnings("unchecked")

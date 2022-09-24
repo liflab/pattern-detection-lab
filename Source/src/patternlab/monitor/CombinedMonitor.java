@@ -9,7 +9,6 @@ import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.tmf.Fork;
 import patternlab.AllEventually;
-import patternlab.pattern.toomanyactions.TooManyActionsMonitor;
 
 public class CombinedMonitor extends GroupProcessor
 {

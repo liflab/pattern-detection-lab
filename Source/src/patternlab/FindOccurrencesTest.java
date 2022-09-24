@@ -91,6 +91,50 @@ public class FindOccurrencesTest
 			ba.setEventTracker(et);
 		}
 		FindOccurrences fo = new FindOccurrences(ba);
+		fo.setRemoveImmobileOnStart(false);
+		fo.setRemoveNonMatches(true);
+		fo.setRemoveNonProgressing(false);
+		fo.setRemoveSameState(false);
+		Pushable p = fo.getPushableInput();
+		SinkLast sink = new SinkLast();
+		MathSet<MathSet<Integer>> matches;
+		Connector.connect(fo, sink);
+		p.push("c");
+		matches = (MathSet<MathSet<Integer>>) sink.getLast()[0];
+		assertEquals(0, matches.size());
+		p.push("a");
+		matches = (MathSet<MathSet<Integer>>) sink.getLast()[0];
+		assertEquals(0, matches.size());
+		p.push("b");
+		matches = (MathSet<MathSet<Integer>>) sink.getLast()[0];
+		assertEquals(createMatchSet(new int[] {0, 1, 2}, new int[] {1, 2}), matches);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void test3()
+	{
+		GroupProcessor ba = new GroupProcessor(1, 1);
+		{
+			IndexEventTracker et = new IndexEventTracker();
+			Fork f = new Fork();
+			ApplyFunction is_a = new ApplyFunction(new FunctionTree(TrooleanCast.instance, new FunctionTree(Equals.instance, StreamVariable.X, new Constant("a"))));
+			ApplyFunction is_b = new ApplyFunction(new FunctionTree(TrooleanCast.instance, new FunctionTree(Equals.instance, StreamVariable.X, new Constant("b"))));
+			Connector.connect(et, f, 0, is_a, 0);
+			Connector.connect(et, f, 1, is_b, 0);
+			Sequence seq = new Sequence(2, true);
+			Connector.connect(et, is_a, 0, seq, 0);
+			Connector.connect(et, is_b, 0, seq, 1);
+			ba.addProcessors(f, is_a, is_b, seq);
+			ba.associateInput(0, f, 0);
+			ba.associateOutput(0, seq, 0);
+			ba.setEventTracker(et);
+		}
+		FindOccurrences fo = new FindOccurrences(ba);
+		fo.setRemoveImmobileOnStart(false);
+		fo.setRemoveNonMatches(true);
+		fo.setRemoveNonProgressing(false);
+		fo.setRemoveSameState(false);
 		Pushable p = fo.getPushableInput();
 		SinkLast sink = new SinkLast();
 		MathSet<MathSet<Integer>> matches;
@@ -103,7 +147,7 @@ public class FindOccurrencesTest
 		assertEquals(0, matches.size());
 		p.push("b");
 		matches = (MathSet<MathSet<Integer>>) sink.getLast()[0];
-		assertEquals(createMatchSet(new int[] {0, 2}, new int[] {1, 2}), matches);
+		assertEquals(createMatchSet(new int[] {1, 2}, new int[] {0, 1, 2}), matches);
 	}
 	
 	protected MathSet<MathSet<Integer>> createMatchSet(int[] ... positions)

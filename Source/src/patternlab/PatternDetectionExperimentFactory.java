@@ -23,7 +23,6 @@ import java.util.List;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.provenance.IndexEventTracker;
-import ca.uqac.lif.cep.tmf.QueueSource;
 import ca.uqac.lif.labpal.Laboratory;
 import ca.uqac.lif.labpal.experiment.ExperimentFactory;
 import ca.uqac.lif.labpal.region.Point;
@@ -50,44 +49,37 @@ import static patternlab.PatternDetectionExperiment.P_PATTERN;
 public class PatternDetectionExperimentFactory extends ExperimentFactory<PatternDetectionExperiment>
 {
 	protected static final int s_defaultThreshold = 3;
-	
+
 	protected static final int s_defaultLinearPatternLength = 2;
-	
+
 	protected static final int s_defaultCombinedPatterns = 3;
-	
+
 	protected int m_logLength;
-	
+
 	public PatternDetectionExperimentFactory(Laboratory lab, int log_length)
 	{
 		super(lab);
 		m_logLength = log_length;
 	}
 	
+	public PatternDetectionExperimentFactory(PatternDetectionExperimentFactory factory)
+	{
+		super(factory);
+		m_logLength = factory.m_logLength;
+	}
+
 	@Override
 	protected PatternDetectionExperiment createExperiment(Point p)
 	{
-		Processor pattern = getPattern(p);
-		Processor ifp = getMonitor(p);
-		if (pattern == null || ifp == null)
+		PatternDetectionExperiment pde = new PatternDetectionExperiment();
+		if (!setPattern(p, pde, m_logLength))
 		{
 			return null;
 		}
-		switch (p.getString(P_ALGORITHM))
+		if (!setMonitor(p, pde))
 		{
-		case Monitor.PROGRESSING:
-			((Monitor) ifp).setRemoveSameState(false);
-			break;
-		case Monitor.FIRST_STEP:
-			((Monitor) ifp).setRemoveSameState(false);
-			((Monitor) ifp).setRemoveNonProgressing(false);
-			break;
-		case Monitor.DIRECT:
-			((Monitor) ifp).setRemoveSameState(false);
-			((Monitor) ifp).setRemoveNonProgressing(false);
-			((Monitor) ifp).setRemoveImmobileOnStart(false);
-			break;
+			return null;
 		}
-		PatternDetectionExperiment pde = new PatternDetectionExperiment(pattern, ifp, m_logLength);
 		pde.writeInput(P_PATTERN, p.getString(P_PATTERN));
 		pde.writeInput(P_ALGORITHM, p.getString(P_ALGORITHM));
 		pde.writeInput(P_ALPHA, p.get(P_ALPHA));
@@ -111,126 +103,195 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 	{
 		return PatternDetectionExperiment.class;
 	}
-	
+
 	/**
-	 * Gets the picker instance corresponding to a given pattern name.
+	 * Sets the picker instance corresponding to a given pattern name.
 	 * @param p The point containing the information about the experiment to
 	 * create
-	 * @return The picker
+	 * @param e The experiment to which this picker is added
+	 * @param log_length The number of events the picker instance is set to
+	 * generate
 	 */
-	protected Processor getPattern(Point p)
+	protected boolean setPattern(Point p, PatternDetectionExperiment e, int log_length)
 	{
 		String pattern_name = p.getString(P_PATTERN);
 		float alpha = (Float) p.get(P_ALPHA);
 		switch (pattern_name)
 		{
-			case TooManyActionsPattern.NAME:
-			{
-				int num_payloads = 10;
-				if (p.get(TooManyActionsPattern.P_PAYLOADS) != null)
-				{
-					num_payloads = p.getInt(TooManyActionsPattern.P_PAYLOADS);
-				}
-				List<String> payloads = new ArrayList<String>();
-				for (int i = 0; i < num_payloads; i++)
-				{
-					payloads.add(Integer.toString(i));
-				}
-				RandomInteger ri = new RandomInteger().setSeed(0);
-				RandomInteger id_picker = new RandomInteger().setInterval(0, 1000).setSeed(0);
-				RandomFloat rf = new RandomFloat().setSeed(0);
-				int threshold = s_defaultThreshold;
-				if (p.get(TooManyActionsMonitor.P_THRESHOLD) != null)
-				{
-					threshold = p.getInt(TooManyActionsMonitor.P_THRESHOLD);
-				}
-				List<String> safe_payloads = new ArrayList<String>(threshold);
-				for (int i = 0; i < threshold - 1; i++)
-				{
-					safe_payloads.add(payloads.get(i));
-				}
-				InjectedPatternPicker<Tuple> ipp = new InjectedPatternPicker<Tuple>(
-						new NormalActionsPattern(safe_payloads, ri, id_picker), 
-						new TooManyActionsPattern(payloads, new RandomBoolean(0.5f).setSeed(0), new RandomInteger().setSeed(0)), 1, alpha, rf);
-				InjectedPatternSource<Tuple> ips = new InjectedPatternSource<Tuple>(ipp, m_logLength);
-				//QueueSource ips = new QueueSource().setEvents(new Tuple(0, "0"), new Tuple(0, "1"), new Tuple(0, "2")).loop(false);
-				return ips;
-			}
-			case LinearPattern.NAME:
-			{
-				int pattern_length = s_defaultLinearPatternLength;
-				if (p.get(LinearPattern.P_PATTERN_LENGTH) != null)
-				{
-					pattern_length = p.getInt(LinearPattern.P_PATTERN_LENGTH);
-				}
-				RandomFloat rf = new RandomFloat().setSeed(0);
-				InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(
-						new RandomAlphabet(rf, "a", "c", "d"),
-						new LinearPattern<String>(RandomAlphabet.getUppercaseSequence(0, pattern_length)),
-						1, alpha, rf);
-				InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
-				//QueueSource ips = new QueueSource().setEvents("c", "c", "a", "b").loop(false);
-				return ips;
-			}
-			case CombinedPattern.NAME:
-			{
-				int num_patterns = s_defaultCombinedPatterns;
-				if (p.get(CombinedPattern.P_NUM_PATTERNS) != null)
-				{
-					num_patterns = p.getInt(CombinedPattern.P_NUM_PATTERNS);
-				}
-				RandomFloat rf = new RandomFloat().setSeed(0);
-				InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(
-						new RandomAlphabet(rf, 26), new CombinedPattern(rf, num_patterns), 1, alpha, rf);//.setMaxInstances(1);
-				InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
-				return ips;
-			}
+		case TooManyActionsPattern.NAME:
+		{
+			return setTooManyActionsPattern(p, e, log_length, alpha);
 		}
-		return null;
+		case LinearPattern.NAME:
+		{
+			int pattern_length = s_defaultLinearPatternLength;
+			if (p.get(LinearPattern.P_PATTERN_LENGTH) != null)
+			{
+				pattern_length = p.getInt(LinearPattern.P_PATTERN_LENGTH);
+			}
+			return setLinearPattern(p, e, log_length, alpha, pattern_length	);
+		}
+		case CombinedPattern.NAME:
+		{
+			return setCombinedPattern(p, e, log_length, alpha);
+		}
+		}
+		return false;
+	}
+
+	protected void setLog(PatternDetectionExperiment e, Processor p, int log_length)
+	{
+		e.setLog(p, log_length);
 	}
 	
+	protected boolean setTooManyActionsPattern(Point p, PatternDetectionExperiment e, int log_length, float alpha)
+	{
+		int num_payloads = 10;
+		if (p.get(TooManyActionsPattern.P_PAYLOADS) != null)
+		{
+			num_payloads = p.getInt(TooManyActionsPattern.P_PAYLOADS);
+		}
+		List<String> payloads = new ArrayList<String>();
+		for (int i = 0; i < num_payloads; i++)
+		{
+			payloads.add(Integer.toString(i));
+		}
+		RandomInteger ri = new RandomInteger().setSeed(0);
+		RandomInteger id_picker = new RandomInteger().setInterval(0, 1000).setSeed(0);
+		RandomFloat rf = new RandomFloat().setSeed(0);
+		int threshold = s_defaultThreshold;
+		if (p.get(TooManyActionsMonitor.P_THRESHOLD) != null)
+		{
+			threshold = p.getInt(TooManyActionsMonitor.P_THRESHOLD);
+		}
+		e.writeInput(TooManyActionsMonitor.P_THRESHOLD, threshold);
+		List<String> safe_payloads = new ArrayList<String>(threshold);
+		for (int i = 0; i < threshold - 1; i++)
+		{
+			safe_payloads.add(payloads.get(i));
+		}
+		InjectedPatternPicker<Tuple> ipp = new InjectedPatternPicker<Tuple>(
+				new NormalActionsPattern(safe_payloads, ri, id_picker), 
+				new TooManyActionsPattern(payloads, new RandomBoolean(0.5f).setSeed(0), new RandomInteger().setSeed(0)), 1, alpha, rf);
+		InjectedPatternSource<Tuple> ips = new InjectedPatternSource<Tuple>(ipp, m_logLength);
+		//QueueSource ips = new QueueSource().setEvents(new Tuple(0, "0"), new Tuple(0, "1"), new Tuple(0, "2")).loop(false);
+		setLog(e, ips, log_length);
+		return true;
+	}
+	
+	protected boolean setLinearPattern(Point p, PatternDetectionExperiment e, int log_length, float alpha, int pattern_length)
+	{
+		e.writeInput(LinearPattern.P_PATTERN_LENGTH, pattern_length);
+		RandomFloat rf = new RandomFloat().setSeed(0);
+		InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(
+				new RandomAlphabet(rf, "a", "c", "d"),
+				new LinearPattern<String>(RandomAlphabet.getUppercaseSequence(0, pattern_length)),
+				1, alpha, rf);
+		InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
+		//QueueSource ips = new QueueSource().setEvents("c", "c", "a", "b").loop(false);
+		setLog(e, ips, log_length);
+		return true;
+	}
+	
+	protected boolean setCombinedPattern(Point p, PatternDetectionExperiment e, int log_length, float alpha)
+	{
+		int num_patterns = s_defaultCombinedPatterns;
+		if (p.get(CombinedPattern.P_NUM_PATTERNS) != null)
+		{
+			num_patterns = p.getInt(CombinedPattern.P_NUM_PATTERNS);
+		}
+		e.writeInput(CombinedPattern.P_NUM_PATTERNS, num_patterns);
+		RandomFloat rf = new RandomFloat().setSeed(0);
+		InjectedPatternPicker<String> ipp = new InjectedPatternPicker<String>(
+				new RandomAlphabet(rf, 26), new CombinedPattern(rf, num_patterns), 1, alpha, rf);//.setMaxInstances(1);
+		InjectedPatternSource<String> ips = new InjectedPatternSource<String>(ipp, m_logLength);
+		setLog(e, ips, log_length);
+		return true;
+	}
+
 	/**
-	 * Gets the monitor instance corresponding to a given pattern name.
+	 * Sets the monitor instance corresponding to a given pattern name.
 	 * @param p The point containing the information about the experiment to
 	 * create
-	 * @return The picker
+	 * @param e The experiment to which this monitor is associated
 	 */
-	protected Processor getMonitor(Point p)
+	protected boolean setMonitor(Point p, PatternDetectionExperiment e)
 	{
 		String pattern_name = p.getString(P_PATTERN);
-		
 		switch (pattern_name)
 		{
-			case TooManyActionsMonitor.NAME:
+		case TooManyActionsMonitor.NAME:
+		{
+			int threshold = s_defaultThreshold;
+			if (p.get(TooManyActionsMonitor.P_THRESHOLD) != null)
 			{
-				int threshold = s_defaultThreshold;
-				if (p.get(TooManyActionsMonitor.P_THRESHOLD) != null)
-				{
-					threshold = p.getInt(TooManyActionsPattern.P_PAYLOADS);
-				}
-				return new FindOccurrences(new TooManyActionsMonitorGroup(threshold, new IndexEventTracker()));
+				threshold = p.getInt(TooManyActionsPattern.P_PAYLOADS);
 			}
-			case LinearMonitor.NAME:
-			{
-				int pattern_length = s_defaultLinearPatternLength;
-				if (p.get(LinearPattern.P_PATTERN_LENGTH) != null)
-				{
-					pattern_length = p.getInt(LinearPattern.P_PATTERN_LENGTH);
-				}
-				FindOccurrences ifp = new FindOccurrences(new LinearMonitor<String>(new IndexEventTracker(), RandomAlphabet.getUppercaseSequence(0, pattern_length)));
-				return ifp;
-			}
-			case CombinedPattern.NAME:
-			{
-				int num_patterns = s_defaultCombinedPatterns;
-				if (p.get(CombinedPattern.P_NUM_PATTERNS) != null)
-				{
-					num_patterns = p.getInt(CombinedPattern.P_NUM_PATTERNS);
-				}
-				FindOccurrences ifp = new FindOccurrences(new CombinedPatternsMonitor(new IndexEventTracker(), num_patterns));
-				return ifp;
-			}
+			return setTooManyActionsMonitor(p, e, threshold);
 		}
-		return null;
+		case LinearMonitor.NAME:
+		{
+			int pattern_length = s_defaultLinearPatternLength;
+			if (p.get(LinearPattern.P_PATTERN_LENGTH) != null)
+			{
+				pattern_length = p.getInt(LinearPattern.P_PATTERN_LENGTH);
+			}
+			return setLinearSequenceMonitor(p, e, pattern_length);
+		}
+		case CombinedPattern.NAME:
+		{
+			int num_patterns = s_defaultCombinedPatterns;
+			if (p.get(CombinedPattern.P_NUM_PATTERNS) != null)
+			{
+				num_patterns = p.getInt(CombinedPattern.P_NUM_PATTERNS);
+			}
+			return setCombinedPatternMonitor(p, e, num_patterns);
+		}
+		}
+		return false;
+	}
+	
+	protected boolean setTooManyActionsMonitor(Point p, PatternDetectionExperiment e, int threshold)
+	{
+		FindOccurrences m = new FindOccurrences(new TooManyActionsMonitorGroup(threshold, new IndexEventTracker()));
+		setupMonitor(p, m);
+		e.setMonitor(m);
+		return true;
+	}
+	
+	protected boolean setLinearSequenceMonitor(Point p, PatternDetectionExperiment e, int pattern_length)
+	{
+		FindOccurrences m = new FindOccurrences(new LinearMonitor<String>(new IndexEventTracker(), RandomAlphabet.getUppercaseSequence(0, pattern_length)));
+		setupMonitor(p, m);
+		e.setMonitor(m);
+		return true;
+	}
+	
+	protected boolean setCombinedPatternMonitor(Point p, PatternDetectionExperiment e, int num_patterns)
+	{
+		FindOccurrences m = new FindOccurrences(new CombinedPatternsMonitor(new IndexEventTracker(), num_patterns));
+		setupMonitor(p, m);
+		e.setMonitor(m);
+		return true;
+
+	}
+
+	protected void setupMonitor(Point p, Monitor m)
+	{
+		switch (p.getString(P_ALGORITHM))
+		{
+		case Monitor.PROGRESSING:
+			m.setRemoveSameState(false);
+			break;
+		case Monitor.FIRST_STEP:
+			m.setRemoveSameState(false);
+			m.setRemoveNonProgressing(false);
+			break;
+		case Monitor.DIRECT:
+			m.setRemoveSameState(false);
+			m.setRemoveNonProgressing(false);
+			m.setRemoveImmobileOnStart(false);
+			break;
+		}
 	}
 }
