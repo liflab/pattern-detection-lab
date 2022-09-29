@@ -333,8 +333,9 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 			m.setRemoveNonProgressing(false);
 			break;
 		case Monitor.FIRST_STEP:
+		  m.setRemoveNonProgressing(false);
 			m.setRemoveSameState(false);
-			m.setRemoveNonProgressing(false);
+			
 			break;
 		case Monitor.DIRECT:
 			m.setRemoveSameState(false);
