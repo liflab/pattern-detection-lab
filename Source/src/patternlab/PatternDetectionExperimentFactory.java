@@ -280,8 +280,8 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 	{
 		switch (p.getString(P_ALGORITHM))
 		{
-		case Monitor.PROGRESSING:
-			m.setRemoveSameState(false);
+		case Monitor.DISTINCT_STATES:
+			m.setRemoveNonProgressing(false);
 			break;
 		case Monitor.FIRST_STEP:
 			m.setRemoveSameState(false);
