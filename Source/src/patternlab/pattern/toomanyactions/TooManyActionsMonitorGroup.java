@@ -8,6 +8,7 @@ import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.tmf.QueueSink;
 import patternlab.SomeSlice;
+import patternlab.pattern.Tuple;
 
 public class TooManyActionsMonitorGroup extends SomeSlice
 {

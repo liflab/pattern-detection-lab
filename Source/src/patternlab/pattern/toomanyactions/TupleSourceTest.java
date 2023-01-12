@@ -9,6 +9,7 @@ import ca.uqac.lif.synthia.random.RandomFloat;
 import ca.uqac.lif.synthia.random.RandomInteger;
 import patternlab.pattern.InjectedPatternPicker;
 import patternlab.pattern.InjectedPatternSource;
+import patternlab.pattern.Tuple;
 
 public class TupleSourceTest
 {

@@ -6,6 +6,7 @@ import java.util.List;
 import ca.uqac.lif.synthia.Picker;
 import ca.uqac.lif.synthia.random.RandomInteger;
 import patternlab.pattern.Notifiable;
+import patternlab.pattern.Tuple;
 
 public class NormalActionsPattern implements Picker<List<Tuple>>, Notifiable<Tuple>
 {

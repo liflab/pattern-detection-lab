@@ -1,4 +1,4 @@
-package patternlab.pattern.toomanyactions;
+package patternlab.pattern;
 
 import ca.uqac.lif.cep.functions.UnaryFunction;
 
@@ -29,6 +29,16 @@ public class Tuple
 		super();
 		m_id = id;
 		m_payload = payload;
+	}
+	
+	public String getPayload()
+	{
+		return m_payload;
+	}
+	
+	public int getId()
+	{
+		return m_id;
 	}
 	
 	@Override

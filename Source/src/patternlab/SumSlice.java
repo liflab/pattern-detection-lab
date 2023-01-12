@@ -25,38 +25,38 @@ import ca.uqac.lif.cep.EventTracker;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.functions.Function;
 import ca.uqac.lif.cep.functions.UnaryFunction;
-import ca.uqac.lif.cep.ltl.Troolean;
 import ca.uqac.lif.cep.provenance.ProvenanceTree;
 import ca.uqac.lif.petitpoucet.ProvenanceNode;
 
-public class SomeSlice extends MonitorSlice
+public class SumSlice extends MonitorSlice
 {
-	public SomeSlice(Function f, Processor p)
+	public SumSlice(Function f, Processor p)
 	{
 		super(f, p);
-		m_cleaningFunction = new RemoveNonMatches();
+		m_cleaningFunction = new RemoveNullValues();
 	}
-
+	
 	@Override
-	public SomeSlice duplicate(boolean with_state)
+	public SumSlice duplicate(boolean with_state)
 	{
-		SomeSlice ss = new SomeSlice(m_slicingFunction.duplicate(), m_processor.duplicate());
+		SumSlice ss = new SumSlice(m_slicingFunction.duplicate(), m_processor.duplicate());
 		copyInto(ss, with_state);
 		return ss;
 	}
-
+	
 	@Override
 	protected boolean produceReturn(Queue<Object[]> outputs)
 	{
-		Troolean.Value verdict = Troolean.Value.INCONCLUSIVE;
+		int value = 0;
 		for (Map.Entry<Object,Object> entry : m_lastValues.entrySet())
 		{
 			Object v = entry.getValue();
-			if (v instanceof Troolean.Value)
+			if (v instanceof Number)
 			{
-				if ((Troolean.Value) v == Troolean.Value.TRUE)
+				int v_n = ((Number) v).intValue();
+				if (v_n > 0 || !m_removeNonMatches)
 				{
-					verdict = Troolean.Value.TRUE;
+					value += v_n;
 					if (m_eventTracker != null)
 					{
 						Object slice_id = entry.getKey();
@@ -84,13 +84,13 @@ public class SomeSlice extends MonitorSlice
 			}
 		}
 		m_numInputs++;
-		outputs.add(new Object[] {verdict});
+		outputs.add(new Object[] {value});
 		return true;
 	}
-
-	protected class RemoveNonMatches extends UnaryFunction<Object,Boolean>
+	
+	protected class RemoveNullValues extends UnaryFunction<Object,Boolean>
 	{
-		public RemoveNonMatches()
+		public RemoveNullValues()
 		{
 			super(Object.class, Boolean.class);
 		}
@@ -98,11 +98,12 @@ public class SomeSlice extends MonitorSlice
 		@Override
 		public Boolean getValue(Object x)
 		{
-			if (x instanceof Troolean.Value && x == Troolean.Value.FALSE && m_removeNonMatches)
+			if (x instanceof Number && ((Number) x).intValue() == 0 && m_removeNonMatches)
 			{
 				return true;
 			}
 			return false;
 		}
 	}
+
 }

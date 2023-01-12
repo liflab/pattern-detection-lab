@@ -61,6 +61,7 @@ import static patternlab.FindOccurrences.FIRST_STEP;
 import static patternlab.FindOccurrences.PROGRESSING;
 import static patternlab.FindOccurrences.DISTINCT_STATES;
 
+@SuppressWarnings("unused")
 public class MainLab extends Laboratory
 {
 	@Override

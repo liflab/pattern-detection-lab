@@ -32,6 +32,7 @@ import ca.uqac.lif.synthia.random.RandomInteger;
 import patternlab.pattern.InjectedPatternPicker;
 import patternlab.pattern.InjectedPatternSource;
 import patternlab.pattern.RandomAlphabet;
+import patternlab.pattern.Tuple;
 import patternlab.pattern.bfollowsa.LinearMonitor;
 import patternlab.pattern.bfollowsa.LinearPattern;
 import patternlab.pattern.combined.CombinedPatternsMonitor;
@@ -40,7 +41,6 @@ import patternlab.pattern.toomanyactions.NormalActionsPattern;
 import patternlab.pattern.toomanyactions.TooManyActionsMonitor;
 import patternlab.pattern.toomanyactions.TooManyActionsMonitorGroup;
 import patternlab.pattern.toomanyactions.TooManyActionsPattern;
-import patternlab.pattern.toomanyactions.Tuple;
 
 import static patternlab.PatternDetectionExperiment.P_ALGORITHM;
 import static patternlab.PatternDetectionExperiment.P_ALPHA;
