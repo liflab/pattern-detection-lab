@@ -28,7 +28,7 @@ import patternlab.pattern.Tuple;
 
 public class TooManyActionsPattern implements Picker<List<Tuple>>, Notifiable<Tuple>
 {
-	public static final String NAME = "Port scanning";
+	public static final String NAME = "Threshold";
 	
 	public static final String P_PAYLOADS = "Number of payloads";
 	

@@ -23,6 +23,7 @@ import static patternlab.PatternDetectionExperiment.P_PATTERN;
 import ca.uqac.lif.labpal.region.Point;
 import patternlab.pattern.bfollowsa.LinearPattern;
 import patternlab.pattern.combined.CombinedPattern;
+import patternlab.pattern.incomplete.IncompletePattern;
 import patternlab.pattern.toomanyactions.TooManyActionsPattern;
 
 public class SameLogExperimentFactory extends PatternDetectionExperimentFactory
@@ -50,6 +51,10 @@ public class SameLogExperimentFactory extends PatternDetectionExperimentFactory
 		case CombinedPattern.NAME:
 		{
 			return setCombinedPattern(p, e, log_length, alpha);
+		}
+		case IncompletePattern.NAME:
+		{
+			return setIncompletePattern(p, e, log_length, alpha);
 		}
 		}
 		return false;

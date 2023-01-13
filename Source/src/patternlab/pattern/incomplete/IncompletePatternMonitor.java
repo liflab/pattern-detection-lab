@@ -42,6 +42,13 @@ import patternlab.pattern.Tuple;
 
 public class IncompletePatternMonitor extends GroupProcessor implements Monitor
 {
+	public static final String NAME = IncompletePattern.NAME;
+	
+	/**
+	 * The name of parameter "Threshold"
+	 */
+	public static final String P_THRESHOLD = "Threshold";
+	
 	protected final SumSlice m_slice;
 	
 	public IncompletePatternMonitor(EventTracker tracker, int k)
@@ -90,6 +97,12 @@ public class IncompletePatternMonitor extends GroupProcessor implements Monitor
 	public void setRemoveSameState(boolean b)
 	{
 		m_slice.setRemoveSameState(b);
+	}
+	
+	@Override
+	public void setSpawn(boolean b)
+	{
+		m_slice.setSpawn(b);
 	}
 	
 	public static class SliceHandling extends GroupProcessor

@@ -103,6 +103,15 @@ public abstract class MonitorSlice extends Slice implements Monitor
 	}
 	
 	@Override
+	public void setSpawn(boolean b)
+	{
+		if (m_processor instanceof Monitor)
+		{
+			((Monitor) m_processor).setSpawn(b);
+		}
+	}
+	
+	@Override
 	public int getInstances()
 	{
 		return m_slices.size(); // Used to be 0

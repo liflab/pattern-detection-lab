@@ -113,6 +113,7 @@ public class TooManyActionsMonitor extends GroupProcessor
 	 * Main method for testing purposes only.
 	 * @param args
 	 */
+	@SuppressWarnings("unused")
 	public static void main(String[] args)
 	{
 		int threshold = 3;

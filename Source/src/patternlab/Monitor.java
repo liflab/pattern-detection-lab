@@ -40,4 +40,6 @@ public interface Monitor
 	public void setRemoveNonProgressing(boolean b);
 	
 	public void setRemoveSameState(boolean b);
+	
+	public void setSpawn(boolean b);
 }

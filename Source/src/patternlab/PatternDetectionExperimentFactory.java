@@ -29,6 +29,8 @@ import ca.uqac.lif.labpal.region.Point;
 import ca.uqac.lif.synthia.random.RandomBoolean;
 import ca.uqac.lif.synthia.random.RandomFloat;
 import ca.uqac.lif.synthia.random.RandomInteger;
+import ca.uqac.lif.synthia.string.RandomString;
+import ca.uqac.lif.synthia.util.Constant;
 import patternlab.pattern.InjectedPatternPicker;
 import patternlab.pattern.InjectedPatternSource;
 import patternlab.pattern.RandomAlphabet;
@@ -36,6 +38,10 @@ import patternlab.pattern.Tuple;
 import patternlab.pattern.bfollowsa.LinearMonitor;
 import patternlab.pattern.bfollowsa.LinearPattern;
 import patternlab.pattern.combined.CombinedPatternsMonitor;
+import patternlab.pattern.incomplete.AttackPattern;
+import patternlab.pattern.incomplete.IncompletePattern;
+import patternlab.pattern.incomplete.IncompletePatternMonitor;
+import patternlab.pattern.incomplete.NormalPattern;
 import patternlab.pattern.combined.CombinedPattern;
 import patternlab.pattern.toomanyactions.NormalActionsPattern;
 import patternlab.pattern.toomanyactions.TooManyActionsMonitor;
@@ -135,6 +141,10 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		{
 			return setCombinedPattern(p, e, log_length, alpha);
 		}
+		case IncompletePattern.NAME:
+		{
+			return setIncompletePattern(p, e, log_length, alpha);
+		}
 		}
 		return false;
 	}
@@ -208,6 +218,28 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		setLog(e, ips, log_length);
 		return true;
 	}
+	
+	protected boolean setIncompletePattern(Point p, PatternDetectionExperiment e, int log_length, float alpha)
+	{
+		int threshold = s_defaultThreshold;
+		if (p.get(IncompletePatternMonitor.P_THRESHOLD) != null)
+		{
+			threshold = p.getInt(IncompletePatternMonitor.P_THRESHOLD);
+		}
+		e.writeInput(IncompletePatternMonitor.P_THRESHOLD, threshold);
+		RandomInteger id_picker = new RandomInteger().setInterval(0, 1000).setSeed(0);
+		RandomFloat rf = new RandomFloat().setSeed(0);
+		char[] payloads = new char[] {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
+		RandomInteger char_index_picker = new RandomInteger(0, payloads.length).setSeed(0);
+		RandomString payload_picker = new RandomString(new Constant<Integer>(1), char_index_picker, payloads);
+		InjectedPatternPicker<Tuple> ipp = new InjectedPatternPicker<Tuple>(
+				new NormalPattern(id_picker, payload_picker), 
+				new AttackPattern(id_picker, payload_picker), threshold + 1, alpha, rf);
+		InjectedPatternSource<Tuple> ips = new InjectedPatternSource<Tuple>(ipp, m_logLength);
+		//QueueSource ips = new QueueSource().setEvents(new Tuple(0, "0"), new Tuple(0, "1"), new Tuple(0, "2")).loop(false);
+		setLog(e, ips, log_length);
+		return true;
+	}
 
 	/**
 	 * Sets the monitor instance corresponding to a given pattern name.
@@ -228,6 +260,15 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 				threshold = p.getInt(TooManyActionsPattern.P_PAYLOADS);
 			}
 			return setTooManyActionsMonitor(p, e, threshold);
+		}
+		case IncompletePatternMonitor.NAME:
+		{
+			int threshold = s_defaultThreshold;
+			if (p.get(IncompletePatternMonitor.P_THRESHOLD) != null)
+			{
+				threshold = p.getInt(IncompletePatternMonitor.P_THRESHOLD);
+			}
+			return setIncompletePatternMonitor(p, e, threshold);
 		}
 		case LinearMonitor.NAME:
 		{
@@ -273,7 +314,15 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 		setupMonitor(p, m);
 		e.setMonitor(m);
 		return true;
-
+	}
+	
+	protected boolean setIncompletePatternMonitor(Point p, PatternDetectionExperiment e, int threshold)
+	{
+		FindOccurrences m = new FindOccurrences(new IncompletePatternMonitor(new IndexEventTracker(), threshold));
+		m.setSpawn(false);
+		setupMonitor(p, m);
+		e.setMonitor(m);
+		return true;
 	}
 
 	protected void setupMonitor(Point p, Monitor m)
