@@ -252,6 +252,7 @@ public class FindOccurrences extends UniformProcessor implements Monitor
 				return indices;
 			}
 			ProvenanceNode root = tracker.getProvenanceTree(m_processor.getId(), 0, m_numPushes - 1);
+			//ProvenanceTree.printTree(root, System.out);
 			List<Integer> stream_indices = ProvenanceTree.getIndices(root);
 			for (int index : stream_indices)
 			{

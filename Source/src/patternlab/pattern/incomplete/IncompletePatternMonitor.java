@@ -56,7 +56,6 @@ public class IncompletePatternMonitor extends GroupProcessor implements Monitor
 		super(1, 1);
 		setEventTracker(tracker);
 		m_slice = new SumSlice(Tuple.getId, new SliceHandling(tracker.getCopy(false)));
-		m_slice.setEventTracker(tracker.getCopy(false));
 		ApplyFunction threshold = new ApplyFunction(new FunctionTree(SoftCast.instance,
 				new FunctionTree(Numbers.isGreaterThan,
 						StreamVariable.X,

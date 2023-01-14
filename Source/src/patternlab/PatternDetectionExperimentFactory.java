@@ -319,7 +319,7 @@ public class PatternDetectionExperimentFactory extends ExperimentFactory<Pattern
 	protected boolean setIncompletePatternMonitor(Point p, PatternDetectionExperiment e, int threshold)
 	{
 		FindOccurrences m = new FindOccurrences(new IncompletePatternMonitor(new IndexEventTracker(), threshold));
-		m.setSpawn(false);
+		//m.setSpawn(false);
 		setupMonitor(p, m);
 		e.setMonitor(m);
 		return true;

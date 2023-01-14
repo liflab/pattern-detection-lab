@@ -176,9 +176,9 @@ public class PatternDetectionExperiment extends Experiment
 		writeOutput(P_TIME, new Millisecond(Stopwatch.stop(this)));
 		writeOutput(P_DETECTED, detected);
 		writeOutput(P_WITNESS_EVENTS, witnesses);
-		writeOutput(P_WITNESS_FRACTION, (float) all_witnesses.size() / (float) m_logLength);
+		writeOutput(P_WITNESS_FRACTION, (float) all_witnesses.size() / (float) len);
 		writeOutput(P_AVG_WITNESS_EVENTS, (float) witnesses / (float) detected);
-		writeOutput(P_LOG_LENGTH, m_logLength);
+		writeOutput(P_LOG_LENGTH, len);
 		writeOutput(P_MAX_INSTANCES, max_instances);
 	}
 	

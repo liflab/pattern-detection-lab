@@ -22,13 +22,15 @@ import java.util.Map;
 import java.util.Queue;
 
 import ca.uqac.lif.cep.EventTracker;
+import ca.uqac.lif.cep.GroupProcessor;
 import ca.uqac.lif.cep.Processor;
+import ca.uqac.lif.cep.Stateful;
 import ca.uqac.lif.cep.functions.Function;
 import ca.uqac.lif.cep.functions.UnaryFunction;
 import ca.uqac.lif.cep.provenance.ProvenanceTree;
 import ca.uqac.lif.petitpoucet.ProvenanceNode;
 
-public class SumSlice extends MonitorSlice
+public class SumSlice extends MonitorSlice implements Stateful
 {
 	public SumSlice(Function f, Processor p)
 	{
@@ -61,12 +63,24 @@ public class SumSlice extends MonitorSlice
 					{
 						Object slice_id = entry.getKey();
 						List<Integer> indices = m_sliceIndices.get(slice_id);
+						List<Integer> in_indices;
 						if (m_removeNonProgressing)
 						{
 							Processor p_slice = m_slices.get(slice_id);
-							EventTracker in_tracker = p_slice.getEventTracker();
-							ProvenanceNode root = in_tracker.getProvenanceTree(p_slice.getId(), 0, indices.size() - 1);
-							List<Integer> in_indices = ProvenanceTree.getIndices(root);
+							if (p_slice instanceof GroupProcessor)
+							{
+								GroupProcessor gp_slice = (GroupProcessor) p_slice;
+								EventTracker in_tracker = gp_slice.getInnerTracker();
+								int p_id = gp_slice.getAssociatedOutput(0).getId();
+								ProvenanceNode root = in_tracker.getProvenanceTree(p_id, 0, indices.size() - 1);
+								in_indices = ProvenanceTree.getIndices(root);
+							}
+							else
+							{
+								EventTracker in_tracker = p_slice.getEventTracker();
+								ProvenanceNode root = in_tracker.getProvenanceTree(p_slice.getId(), 0, indices.size() - 1);
+								in_indices = ProvenanceTree.getIndices(root);
+							}
 							for (int i : in_indices)
 							{
 								m_eventTracker.associateToInput(getId(), 0, indices.get(i), 0, m_numInputs);

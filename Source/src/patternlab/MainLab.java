@@ -72,8 +72,8 @@ public class MainLab extends Laboratory
 
 		Region big_r = product(
 				extension(P_ALGORITHM, DIRECT, FIRST_STEP, PROGRESSING, DISTINCT_STATES),
-				extension(P_PATTERN, /*LinearPattern.NAME, TooManyActionsPattern.NAME, CombinedPattern.NAME,*/ IncompletePattern.NAME),
-				extension(P_ALPHA, /*0.999f, 0.99f, */ /*0.9f, 0.75f,*/ 0.5f));
+				extension(P_PATTERN, LinearPattern.NAME, TooManyActionsPattern.NAME, CombinedPattern.NAME, IncompletePattern.NAME),
+				extension(P_ALPHA, /*0.999f, 0.99f, */ 0.9f /*, 0.75f, 0.5f */));
 
 		// For fixed alpha
 		for (Region r : big_r.all(P_ALPHA))
