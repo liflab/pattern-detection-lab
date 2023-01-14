@@ -155,7 +155,7 @@ public class PatternDetectionExperiment extends Experiment
 			len++;
 			setProgression((float) len / (float) m_logLength); 
 			Object e = pl.pull();
-			System.out.print(e);
+			// System.out.print(e);
 			ph.push(e);
 			if (m_pattern instanceof Monitor)
 			{
@@ -172,7 +172,7 @@ public class PatternDetectionExperiment extends Experiment
 				}
 			}
 		}
-		System.out.println(readString(P_ALGORITHM) + " " + all_witnesses);
+		// System.out.println(readString(P_ALGORITHM) + " " + all_witnesses);
 		writeOutput(P_TIME, new Millisecond(Stopwatch.stop(this)));
 		writeOutput(P_DETECTED, detected);
 		writeOutput(P_WITNESS_EVENTS, witnesses);

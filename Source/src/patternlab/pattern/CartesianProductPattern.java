@@ -94,7 +94,7 @@ public class CartesianProductPattern<T> implements Picker<List<T>>, Notifiable<T
 			}
 			catch (IndexOutOfBoundsException e)
 			{
-				System.out.println("FOO");
+				e.printStackTrace();
 			}
 		}
 		throw new NoMoreElementException();
