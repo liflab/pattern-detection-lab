@@ -73,9 +73,11 @@ open source and publicly available:
 
 - Version 0.10.8 of the [BeepBeep](https://github.com/liflab/beepbeep-3)
   event stream processing engine
-- The *LTL* and *Provenance*
+- The *Fsm*, *Ltl* and *Provenance*
   [palettes](https://github.com/liflab/beepbeep-3-palettes) of the January 2023
-  pre-compiled bundle (i.e. `ltl.jar` and `provenance.jar`)
+  pre-compiled bundle (i.e. `fsm.jar`, `ltl.jar` and `provenance.jar`)
+- Version 0.3 of the [Synthia](https://github.com/liflab/synthia) data structure
+  generator
 - Version 2.99-beta 1 of the [LabPal](https://github.com/liflab/labpal)
   experimental environment
 

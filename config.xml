@@ -37,12 +37,17 @@
   	<filename>pattern-detection-lab.jar</filename>
   </jar>
   
+  <srcdir>Source/src</srcdir>
+  <depdir>Source/dep</depdir>
+  <libdir>Source/lib</libdir>
+  <bindir>Source/bin</bindir>
+  
   <test>
     <!-- The filename pattern to recognize test files -->
-    <!-- <filenamepattern>
+    <filenamepattern>
            <src>**/*Test.java</src>
            <bin>**/*Test.class</bin>
-         </filenamepattern> -->
+    </filenamepattern>
   </test>
   
   <!--
@@ -68,6 +73,15 @@
       <bundle>true</bundle>
     </dependency>
     <dependency>
+      <!-- BeepBeep 3 FSM Palette -->
+      <name>BeepBeep FSM Palette</name>
+      <classname>ca.uqac.lif.cep.fsm.MooreMachine</classname>
+      <files>
+        <jar>https://github.com/liflab/beepbeep-3-palettes/releases/download/v20230115/fsm.jar</jar>
+      </files>
+      <bundle>true</bundle>
+    </dependency>
+    <dependency>
       <!-- BeepBeep 3 Provenance Palette -->
       <name>BeepBeep Provenance Palette</name>
       <classname>ca.uqac.lif.cep.provenance.ProvenanceNode</classname>
@@ -82,6 +96,15 @@
       <classname>ca.uqac.lif.labpal.Laboratory</classname>
       <files>
         <jar>https://github.com/liflab/labpal/releases/download/v2.99-beta1/labpal.jar</jar>
+      </files>
+      <bundle>true</bundle>
+    </dependency>
+    <dependency>
+      <!-- Synthia Core -->
+      <name>Synthia Core</name>
+      <classname>ca.uqac.lif.synthia.Picker</classname>
+      <files>
+        <jar>https://github.com/liflab/synthia/releases/download/v0.3/synthia-core.jar</jar>
       </files>
       <bundle>true</bundle>
     </dependency>
