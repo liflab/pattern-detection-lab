@@ -63,7 +63,7 @@
       <name>BeepBeep LTL Palette</name>
       <classname>ca.uqac.lif.cep.ltl.Troolean</classname>
       <files>
-        <jar>https://github.com/liflab/beepbeep-3-palettes/releases/download/v20210430/ltl.jar</jar>
+        <jar>https://github.com/liflab/beepbeep-3-palettes/releases/download/v20230115/ltl.jar</jar>
       </files>
       <bundle>true</bundle>
     </dependency>
@@ -72,7 +72,7 @@
       <name>BeepBeep Provenance Palette</name>
       <classname>ca.uqac.lif.cep.provenance.ProvenanceNode</classname>
       <files>
-        <jar>https://github.com/liflab/beepbeep-3-palettes/releases/download/v20210430/provenance.jar</jar>
+        <jar>https://github.com/liflab/beepbeep-3-palettes/releases/download/v20230115/provenance.jar</jar>
       </files>
       <bundle>true</bundle>
     </dependency>
