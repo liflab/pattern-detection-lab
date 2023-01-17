@@ -41,7 +41,7 @@ public class RandomAlphabet extends Choice<List<String>>
 		for (int i = 0; i < size; i++)
 		{
 			List<String> list = new ArrayList<String>(1);
-			list.add(Character.toString(start_index + i));
+			list.add(Character.toString((char) (start_index + i)));
 			this.add(new Constant<List<String>>(list), p);
 		}
 	}
@@ -63,7 +63,7 @@ public class RandomAlphabet extends Choice<List<String>>
 		List<String> list = new ArrayList<String>(size);
 		for (int i = 0; i < size; i++)
 		{
-			list.add(Character.toString(65 + i + offset)); // 65 = ASCII "A"
+			list.add(Character.toString((char) (65 + i + offset))); // 65 = ASCII "A"
 		}
 		return list;
 	}
@@ -73,7 +73,7 @@ public class RandomAlphabet extends Choice<List<String>>
 		List<String> list = new ArrayList<String>(size);
 		for (int i = 0; i < size; i++)
 		{
-			list.add(Character.toString(97 + i + offset)); // 97 = ASCII "a"
+			list.add(Character.toString((char) (97 + i + offset))); // 97 = ASCII "a"
 		}
 		return list;
 	}
