@@ -49,6 +49,8 @@
            <bin>**/*Test.class</bin>
     </filenamepattern>
   </test>
+
+  <targetjdk>8</targetjdk>
   
   <!--
     Write JAR dependencies here.
