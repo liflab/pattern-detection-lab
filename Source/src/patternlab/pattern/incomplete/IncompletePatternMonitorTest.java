@@ -78,13 +78,13 @@ public class IncompletePatternMonitorTest
 			// First instance
 			IncompletePatternMonitor ipm1 = new IncompletePatternMonitor(tracker, 1);
 			QueueSink sink1 = new QueueSink();
-			Queue<Object> q1 = sink1.getQueue();
+			sink1.getQueue();
 			Connector.connect(ipm1, sink1);
 			Pushable p1 = ipm1.getPushableInput();
 			// Second instance
 			IncompletePatternMonitor ipm2 = new IncompletePatternMonitor(tracker, 1);
 			QueueSink sink2 = new QueueSink();
-			Queue<Object> q2 = sink2.getQueue();
+			sink2.getQueue();
 			Connector.connect(ipm2, sink2);
 			Pushable p2 = ipm2.getPushableInput();
 			p1.push(new Tuple(0, "A"));

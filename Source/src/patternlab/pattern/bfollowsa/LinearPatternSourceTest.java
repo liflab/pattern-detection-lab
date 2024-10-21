@@ -8,6 +8,7 @@ import patternlab.pattern.RandomAlphabet;
 
 public class LinearPatternSourceTest
 {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void main(String[] args)
 	{
 		RandomFloat rf = new RandomFloat();

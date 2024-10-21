@@ -6,7 +6,6 @@ import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.provenance.IndexEventTracker;
 import ca.uqac.lif.cep.tmf.SinkLast;
-import ca.uqac.lif.petitpoucet.ProvenanceNode;
 import patternlab.monitor.AtomicSequence;
 import patternlab.monitor.CombinedMonitor;
 import patternlab.pattern.RandomAlphabet;
@@ -45,23 +44,22 @@ public class CombinedPatternsMonitor extends CombinedMonitor
 		Pushable p = mon.getPushableInput();
 		SinkLast last = new SinkLast();
 		Connector.connect(mon, last);
-		Object state;
-		state = mon.getState();
+		mon.getState();
 		p.push("A");
-		state = mon.getState();
+		mon.getState();
 		p.push("B");
-		state = mon.getState();
+		mon.getState();
 		p.push("x");
-		state = mon.getState();
+		mon.getState();
 		p.push("C");
-		state = mon.getState();
+		mon.getState();
 		p.push("D");
-		state = mon.getState();
+		mon.getState();
 		p.push("E");
-		state = mon.getState();
+		mon.getState();
 		p.push("F");
-		state = mon.getState();
-		ProvenanceNode root = tracker.getProvenanceTree(mon, 0, 6);
+		mon.getState();
+		tracker.getProvenanceTree(mon, 0, 6);
 		
 	}
 }

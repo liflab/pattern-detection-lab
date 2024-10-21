@@ -46,6 +46,6 @@ public class CombinedMonitor extends GroupProcessor
 	public static void main(String[] args)
 	{
 		CombinedMonitor cm = new CombinedMonitor(new IndexEventTracker(), new AtomicSequence<String>(new IndexEventTracker(), Arrays.asList("a", "b")), new AtomicSequence<String>(new IndexEventTracker(), Arrays.asList("c", "d")));
-		Processor gp = cm.duplicate();
+		cm.duplicate();
 	}
 }
